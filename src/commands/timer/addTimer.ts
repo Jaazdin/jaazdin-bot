@@ -76,7 +76,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
   //todo check to see if timer name doesn't already exist.
 
   if (!name || !weeks || !type || !char) {
-    console.log(name, weeks, type, char);
     return interaction.reply('Please provide all required fields.');
   }
 

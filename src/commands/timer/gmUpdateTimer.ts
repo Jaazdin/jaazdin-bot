@@ -34,7 +34,6 @@ const commandData: CommandData = {
 async function autocomplete(interaction: AutocompleteInteraction) {
   const focusedOption = interaction.options.getFocused(true);
   const player = (interaction.options.get('player')?.value as string) || interaction.user.id;
-  console.log(player);
 
   if (focusedOption.name === 'timer') {
     // Find all timers for the selected user
