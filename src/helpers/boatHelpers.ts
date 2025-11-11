@@ -369,6 +369,30 @@ export async function generateShipmentItems(boat: Boat): Promise<ShipmentItem[]>
         const metal = await getRandomMetalByRarityExcludingPlanes(rarity, 'Material');
         if (metal) addOrIncrementItem(result, metal.name, randomInt(metal.price_min, metal.price_max), 'metal');
       }
+      // Reagents Generation. 
+      const types = [
+        'Aberration',
+        'Fiend',
+        'Celestial',
+        'Giant',
+        'Construct',
+        'Monstrosity',
+        'Dragon',
+        'Ooze',
+        'Elemental',
+        'Plant',
+        'Fey',
+        'Undead',
+      ];
+      const reagents = Array(3)
+        .fill(0)
+        .map(() => typeFromInclusiveRanges(randomInt(1, 20), REAGENT_RARITY_RANGES, 'Common'));
+      for (const rarity of reagents) {
+        const type = types[randomInt(0, types.length - 1)];
+        const reagent = await getRandomReagentByRarityAndType(rarity, type);
+        if (reagent)
+          addOrIncrementItem(result, reagent.name, randomInt(reagent.price_min, reagent.price_max), 'reagent');
+      }
       return result;
     }
     case 'smuggle': {

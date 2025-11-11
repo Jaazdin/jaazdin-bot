@@ -54,7 +54,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
 
-  const jobData = await Job.findOne({ where: { name: jobName } });
+  const jobData = await Job.findOne({ where: { name: jobName.toLowerCase() } });
 
   if (!jobData) {
     await interaction.reply('Job not found');
