@@ -8,7 +8,7 @@ import { generateRandomArmorWithMetalByRarity } from '~/commands/itemGeneration/
 import { getRandomPetByRarityAndType } from '~/commands/itemGeneration/generatepet';
 import { getRandomReagentByRarity, getRandomReagentByRarityAndType } from '~/commands/itemGeneration/generatereagent';
 import { getRandomMetalByRarity, getRandomMetalByRarityExcludingPlanes } from '~/commands/itemGeneration/generatemetal';
-import { getRandomMealByRarity } from '~/commands/itemGeneration/generatemeal';
+import { getRandomMealByRarity } from '~/commands/itemGeneration/generatefood';
 import { getRandomPotionByRarity } from '~/commands/itemGeneration/generatepotion';
 import { getRandomPoisonByRarity } from '~/commands/itemGeneration/generatepoison';
 import { getRandomSeedByRarity } from '~/commands/itemGeneration/generateseeds';

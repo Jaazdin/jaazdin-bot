@@ -15,7 +15,7 @@
   },
   {
     "bonus": "Choose another Red Banner, they can roll 1d10+half your job to gain Dojo Training Points. You gain Dojo Training Points equal to half the value.",
-    "roll": { "min": 86, "max": 96 }
+    "roll": { "min": 86, "max": 95 }
   },
   {
     "bonus": "Decrease the time it takes to learn your next weapon to 1 week or gain twice your job tier in Dojo Training Points.",
@@ -29,6 +29,6 @@
   { "bonus": "Increase your Wage Progress by 2", "roll": { "min": 126, "max": 135 } },
   {
     "bonus": "Choose another Red Banner, they can roll 1d20+half your job to gain Dojo Training Points. You gain Dojo Training Points equal to half the value.",
-    "roll": { "min": 136, "max": 140 }
+    "roll": { "min": 136, "max": 300 }
   }
 ]

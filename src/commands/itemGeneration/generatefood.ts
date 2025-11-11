@@ -4,7 +4,7 @@ import { createItemEmbed, randomInt, rarityChoices } from '~/helpers';
 import { CommandData } from '~/types';
 
 const commandData: CommandData = {
-  name: 'generatemeal',
+  name: 'generatefood',
   description: 'Generate a random meal by rarity',
   category: 'items',
   options: [

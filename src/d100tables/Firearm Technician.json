@@ -1,0 +1,34 @@
+[
+  { "bonus": "GP Die +1 +10", "roll": { "min": 1, "max": 20 } },
+  {
+    "bonus": "Advantage on next Gunsmiths Tools check.",
+    "roll": { "min": 21, "max": 40 }
+  },
+  {
+    "bonus": "Offer Uncommon Metal Ammunition (250).",
+    "roll": { "min": 41, "max": 55 }
+  },
+  { "bonus": "Increase your wage progress by 1", "roll": { "min": 56, "max": 70 } },
+  {
+    "bonus": "Offer Rare Metal Ammunition (350)",
+    "roll": { "min": 71, "max": 85 }
+  },
+  {
+    "bonus": "You gain a special reagent that can only be used to create +1 Ammunition.",
+    "roll": { "min": 86, "max": 95 }
+  },
+  {
+    "bonus": "Offer Very Rare Metal Ammunition (500).",
+    "roll": { "min": 96, "max": 105 }
+  },
+  { "bonus": "GP Die +3 +30", "roll": { "min": 106, "max": 115 } },
+  {
+    "bonus": "You may immediately make one Gunsmithing Tools check or discount a Firearm Modification by 50% (it must be crafted now to use this bonus).",
+    "roll": { "min": 116, "max": 125 }
+  },
+  { "bonus": "Increase your Wage Progress by 2", "roll": { "min": 126, "max": 135 } },
+  {
+    "bonus": "You gain a special reagent that can only be used to create +2 Ammunition.",
+    "roll": { "min": 136, "max": 300 }
+  }
+]
