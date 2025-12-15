@@ -6,6 +6,11 @@ import { TIMEZONE } from '~/constants';
 
 export async function executeWeeklyTasks(skipUpdate: boolean = false) {
   try {
+    const lastRun = await LastWeeklyRunTime.findOne();
+    if (lastRun && lastRun.getDataValue('paused')) {
+      console.log('Weekly tasks are currently paused. Skipping execution.');
+      return 2;
+    }
     console.log('Starting weekly tasks execution...');
 
     // Get current directory path using import.meta.url
@@ -19,7 +24,7 @@ export async function executeWeeklyTasks(skipUpdate: boolean = false) {
 
     if (filteredFiles.length === 0) {
       console.log('No weekly task files found.');
-      return;
+      return 1;
     }
 
     // Load and collect all tasks
@@ -43,7 +48,7 @@ export async function executeWeeklyTasks(skipUpdate: boolean = false) {
 
     if (tasks.length === 0) {
       console.log('No valid weekly tasks found.');
-      return;
+      return 1;
     }
 
     // Sort by order (lower numbers = earlier posting)
@@ -67,6 +72,7 @@ export async function executeWeeklyTasks(skipUpdate: boolean = false) {
     }
 
     console.log('Weekly tasks execution completed.');
+    return 0;
   } catch (error) {
     console.error('Failed to execute weekly tasks:', error);
     throw error;

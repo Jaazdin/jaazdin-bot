@@ -39,7 +39,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
   const dropTables = interaction.options.getBoolean('drop');
   const seedTables = interaction.options.getBoolean('seed');
 
-  const modelsPath = path.join(__dirname, '~/db', 'models');
+  const modelsPath = path.join(__dirname, '../../db', 'models');
 
   const modelFiles = (await readdir(modelsPath)).filter((file) => file.endsWith('.ts') || file.endsWith('.js'));
 

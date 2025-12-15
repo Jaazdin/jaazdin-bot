@@ -1,0 +1,2 @@
+ALTER TABLE last_weekly_run_time
+ADD COLUMN paused BOOLEAN NOT NULL DEFAULT FALSE;

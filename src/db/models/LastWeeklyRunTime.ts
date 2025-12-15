@@ -12,6 +12,11 @@ LastWeeklyRunTime.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    paused: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     sequelize: db,
@@ -32,6 +37,7 @@ export async function seed() {
 
   await LastWeeklyRunTime.create({
     value: lastMondayRunTime,
+    paused: false,
   });
   console.log('LastWeeklyRunTime seeded!');
 }

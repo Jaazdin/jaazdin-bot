@@ -58,7 +58,19 @@
       "name": "Shield",
       "plates": 2,
       "price": 10,
-      "invalidMetals": ["Ash Quartz", "Pebbelum", "Chromed Silk", "Ratimber", "Hunter's Iron", "Soulsteel", "Devil's Mercury", "Mercurial Sludge", "Olympium", "Unstable Uranium","Stablized Uranium"]
+      "invalidMetals": [
+        "Ash Quartz",
+        "Pebbelum",
+        "Chromed Silk",
+        "Ratimber",
+        "Hunter's Iron",
+        "Soulsteel",
+        "Devil's Mercury",
+        "Mercurial Sludge",
+        "Olympium",
+        "Unstable Uranium",
+        "Stablized Uranium"
+      ]
     }
   ]
 }

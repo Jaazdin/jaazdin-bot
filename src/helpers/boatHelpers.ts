@@ -369,7 +369,7 @@ export async function generateShipmentItems(boat: Boat): Promise<ShipmentItem[]>
         const metal = await getRandomMetalByRarityExcludingPlanes(rarity, 'Material');
         if (metal) addOrIncrementItem(result, metal.name, randomInt(metal.price_min, metal.price_max), 'metal');
       }
-      // Reagents Generation. 
+      // Reagents Generation.
       const types = [
         'Aberration',
         'Fiend',
