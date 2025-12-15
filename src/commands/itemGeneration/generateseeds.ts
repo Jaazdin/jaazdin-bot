@@ -1,12 +1,13 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { Seed } from '~/db/models/Seed';
-import { checkUserRole, createItemEmbed, randomInt, rarityChoices } from '~/helpers';
+import { createItemEmbed, randomInt, rarityChoices } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: 'generateseeds',
   description: 'Generate a random seed by rarity',
   category: 'items',
+  requiredRole: [Roles.GM, Roles.DM],
   options: [
     {
       name: 'rarity',
@@ -28,13 +29,6 @@ async function getRandomSeedByRarity(rarity: string): Promise<Seed | null> {
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, [Roles.GM, Roles.DM])) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
 
   const rarity = interaction.options.getString('rarity', true);
 

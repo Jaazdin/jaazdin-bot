@@ -1,13 +1,14 @@
 import { ChatInputCommandInteraction, AutocompleteInteraction } from 'discord.js';
 import { TIMER_MAX_LENGTH } from '~/constants';
 import { Timer } from '~/db/models/Timer';
-import { checkUserRole, formatNames, parseChangeString } from '~/helpers';
+import { formatNames, parseChangeString } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: 'gmupdatetimer',
   description: 'Updates the remaining weeks on a timer',
   category: 'timer',
+  requiredRole: Roles.GM,
   options: [
     {
       name: 'player',
@@ -73,13 +74,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
   if (isNaN(timerId)) {
     return interaction.reply('Failed to find timer.');
-  }
-
-  // Only GMs can update timers for others
-  if (!checkUserRole(interaction, Roles.GM)) {
-    if (discordId !== interaction.user.id) {
-      return interaction.reply('This is a GM command. Use /updatetimer to update your own timers.');
-    }
   }
 
   const timer = await Timer.findOne({

@@ -1,12 +1,13 @@
 import { ChatInputCommandInteraction, AutocompleteInteraction, MessageFlags } from 'discord.js';
 import { Announcement } from '~/db/models/Announcement';
-import { checkUserRole, confirmAction, formatNames } from '~/helpers';
+import { confirmAction, formatNames } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: 'destroyannouncement',
   description: 'Delete an announcement from the database',
   category: 'announcement',
+  requiredRole: Roles.GM,
   options: [
     {
       name: 'name',
@@ -26,14 +27,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
   if (!announcement) {
     await interaction.reply({
       content: 'Could not find the specified announcement.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
-  if (!checkUserRole(interaction, Roles.GM)) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
       flags: MessageFlags.Ephemeral,
     });
     return;

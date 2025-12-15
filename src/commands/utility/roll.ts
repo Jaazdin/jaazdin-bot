@@ -1,7 +1,5 @@
 import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags } from 'discord.js';
-// import {  checkUserRole } from '~/helpers';
-import { checkUserRole } from '~/helpers';
-import { CommandData, Roles } from '~/types';
+import { CommandData } from '~/types';
 
 type FormulaComponent = {
   type: 'dice' | 'operator' | 'flat';
@@ -31,7 +29,6 @@ const commandData: CommandData = {
   alias: 'r',
   description: 'Rolls a dice formula',
   category: 'utility',
-  requiredRole: [Roles.BOT_DEV, Roles.DM, Roles.GM],
   options: [
     {
       name: 'formula',
@@ -41,8 +38,6 @@ const commandData: CommandData = {
     },
   ],
 };
-
-//
 
 const ModifierPriority = ['r', 'rr', 'k', 'kh', 'kl', 'd', 'dl', 'dh', 'x', 'xo', 'min', 'max'];
 
@@ -651,14 +646,6 @@ function evaluateExpression(expression: string): number {
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, [Roles.BOT_DEV, Roles.DM, Roles.GM])) {
-    await interaction.reply({
-      content: 'This command is WIP, check back later',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
   const formula = interaction.options.getString('formula', true).toLowerCase();
 
   if (!/^[1-9]\d*|d/.test(formula)) {

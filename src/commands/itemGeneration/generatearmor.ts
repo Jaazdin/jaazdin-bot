@@ -1,13 +1,14 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { Armor } from '~/db/models/Armor';
 import { CommandData, Roles } from '~/types';
-import { createItemEmbed, calculateMetalItemPrice, checkUserRole, randomInt, rarityChoices } from '~/helpers';
+import { createItemEmbed, calculateMetalItemPrice, randomInt, rarityChoices } from '~/helpers';
 import { getRandomMetalByRarity } from './generatemetal';
 
 const commandData: CommandData = {
   name: 'generatearmor',
   description: 'Generate a random armor with a random valid metal by rarity',
   category: 'items',
+  requiredRole: [Roles.GM, Roles.DM],
   options: [
     {
       name: 'rarity',
@@ -32,13 +33,6 @@ export async function generateRandomArmorWithMetalByRarity(rarity: string) {
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, [Roles.GM, Roles.DM])) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
 
   const rarity = interaction.options.getString('rarity', true);
 

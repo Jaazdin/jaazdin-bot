@@ -14,13 +14,6 @@ const commandData: CommandData = {
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  // if (!checkUserRole(interaction, Roles.GM)) {
-  //   await interaction.reply({
-  //     content: 'You do not have permission to use this command.',
-  //     flags: MessageFlags.Ephemeral,
-  //   });
-  //   return;
-  // }
 
   const boatName = interaction.options.getString('boat', true);
   const itemName = interaction.options.getString('item', true);

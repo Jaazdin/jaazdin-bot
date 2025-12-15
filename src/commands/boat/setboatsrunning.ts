@@ -1,6 +1,5 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { Boat } from '~/db/models/Boat';
-import { checkUserRole } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 import { Op } from 'sequelize';
 
@@ -8,6 +7,7 @@ const commandData: CommandData = {
   name: 'setboatsrunning',
   description: 'Set all boats to running or not, with optional exceptions',
   category: 'boats',
+  requiredRole: Roles.GM,
   options: [
     {
       name: 'running',
@@ -22,14 +22,6 @@ const commandData: CommandData = {
 //TODO: for boats names use autocomplete to suggest existing boat names
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, Roles.GM)) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
   const running = interaction.options.getBoolean('running', true);
   const exceptionsRaw = interaction.options.getString('exceptions');
   let exceptions: string[] = [];

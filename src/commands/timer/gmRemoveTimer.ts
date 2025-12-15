@@ -1,12 +1,13 @@
 import { ChatInputCommandInteraction, AutocompleteInteraction } from 'discord.js';
 import { Timer } from '~/db/models/Timer';
-import { checkUserRole, confirmAction, formatNames } from '~/helpers';
+import { confirmAction, formatNames } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: 'gmremovetimer',
   description: 'Removes an existing timer',
   category: 'timer',
+  requiredRole: Roles.GM,
   options: [
     {
       name: 'player',
@@ -53,13 +54,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
   if (!timerId) {
     return interaction.reply('Please provide both the timer name and player.');
-  }
-
-  // Only GMs can remove timers for others
-  if (!(checkUserRole(interaction, Roles.GM) && interaction.user.id !== discordId)) {
-    if (discordId !== interaction.user.id) {
-      return interaction.reply('You can only remove your own timers unless you are a GM.');
-    }
   }
 
   const timer = await Timer.findOne({

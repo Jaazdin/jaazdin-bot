@@ -1,12 +1,13 @@
 import { ChatInputCommandInteraction, AutocompleteInteraction, MessageFlags } from 'discord.js';
 import { Boat, Shipment } from '~/db/models/Boat';
-import { checkUserRole, parseChangeString, updateBoatEmbed } from '~/helpers';
+import { parseChangeString, updateBoatEmbed } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: 'updateshipment',
   description: 'Update a shipment item for a boat (by boat and item name)',
   category: 'boats',
+  requiredRole: Roles.GM,
   options: [
     { name: 'boat', type: 'string', description: 'Boat name', required: true, autocomplete: true },
     { name: 'item', type: 'string', description: 'Item name', required: true, autocomplete: true },
@@ -17,13 +18,6 @@ const commandData: CommandData = {
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, Roles.GM)) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
 
   const boatName = interaction.options.getString('boat', true);
   const itemName = interaction.options.getString('item', true);

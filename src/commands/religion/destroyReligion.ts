@@ -1,12 +1,13 @@
 import { AutocompleteInteraction, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { Domain } from '~/db/models/Religion';
-import { checkUserRole, confirmAction, findReligionByName, formatNames, religionCommandAutocomplete } from '~/helpers';
+import { confirmAction, findReligionByName, formatNames, religionCommandAutocomplete } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: 'destroyreligion',
   description: 'Will remove a religion from the active religions',
   category: 'religion',
+  requiredRole: Roles.GM,
   options: [
     {
       name: 'name',
@@ -36,14 +37,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
   if (!domain) {
     await interaction.reply({
       content: 'Could not find the domain for this religion.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
-  if (!checkUserRole(interaction, Roles.GM)) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
       flags: MessageFlags.Ephemeral,
     });
     return;

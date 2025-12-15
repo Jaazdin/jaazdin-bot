@@ -5,22 +5,19 @@ import {
   GatewayIntentBits,
   Collection,
   MessageFlags,
-  SlashCommandBuilder,
   AutocompleteInteraction,
   ChatInputCommandInteraction,
 } from 'discord.js';
 import dotenv from 'dotenv';
-import { CommandFile } from './types';
+import { CommandFile, CommandData } from './types';
 import setupWeeklyTasks from './weeklies/weekly';
 import { db } from './db/db'; // Import your Sequelize instance
-import { buildCommand, getCommandFiles, setupModalInteractionHandler } from './helpers';
-
-// Extend the Client type to include commands
+import { buildCommand, checkUserRole, getCommandFiles, setupModalInteractionHandler } from './helpers';
 
 interface ClientCommandData {
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
   autocomplete: (interaction: AutocompleteInteraction) => Promise<void>;
-  data: SlashCommandBuilder;
+  commandData: CommandData;
 }
 
 declare module 'discord.js' {
@@ -63,6 +60,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!command) return;
 
   try {
+    if (command.commandData.requiredRole && !checkUserRole(interaction, command.commandData.requiredRole)) {
+      await interaction.reply({
+        content: 'You do not have permission to use this command.',
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
     await command.execute(interaction);
   } catch (error) {
     console.error(error);
@@ -99,7 +103,7 @@ async function loadCommands() {
     }
     const dataArray = buildCommand(commandData);
     for (const data of dataArray) {
-      client.commands.set(data.name, { execute, autocomplete, data });
+      client.commands.set(data.name, { execute, autocomplete, commandData });
     }
   }
 }

@@ -1,12 +1,13 @@
 import { ChatInputCommandInteraction, AutocompleteInteraction } from 'discord.js';
 import { MagicItem } from '~/db/models/MagicItem';
-import { checkUserRole, createItemEmbed, randomInt } from '~/helpers';
+import { createItemEmbed, randomInt } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: 'generatemagicitem',
   description: 'Generate a random magic item from a selected table',
   category: 'items',
+  requiredRole: [Roles.GM, Roles.DM],
   options: [
     {
       name: 'table',
@@ -50,12 +51,6 @@ async function getRandomMagicItemByRarity(rarity: string): Promise<MagicItem | n
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, [Roles.GM, Roles.DM])) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
-    });
-    return;
-  }
 
   const table = interaction.options.getString('table', true);
 

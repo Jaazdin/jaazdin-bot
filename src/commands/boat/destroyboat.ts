@@ -1,6 +1,6 @@
-import { AutocompleteInteraction, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
 import { Shipment } from '~/db/models/Boat';
-import { findBoatByName, boatNameAutocomplete, checkUserRole, confirmAction, formatNames } from '~/helpers';
+import { findBoatByName, boatNameAutocomplete, confirmAction, formatNames } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
@@ -8,18 +8,11 @@ const commandData: CommandData = {
   description: 'Will remove a boat from the active boats',
   category: 'boats',
   options: [{ name: 'name', type: 'string', description: 'The name of the boat', required: true, autocomplete: true }],
+  requiredRole: Roles.GM,
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
   const name = interaction.options.getString('name') as string;
-
-  if (!checkUserRole(interaction, Roles.GM)) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
 
   // Use helper to find boat with error handling
   const boat = await findBoatByName(interaction, name);

@@ -1,5 +1,4 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { checkUserRole } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,6 +8,7 @@ const commandData: CommandData = {
   name: 'resetdb',
   description: 'Resets the database',
   category: 'utility',
+  requiredRole: Roles.BOT_DEV,
   options: [
     {
       name: 'drop',
@@ -29,12 +29,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
   interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-
-  const hasRole = checkUserRole(interaction, Roles.BOT_DEV);
-  if (!hasRole) {
-    await interaction.reply('You do not have permission to use this command');
-    return;
-  }
 
   const dropTables = interaction.options.getBoolean('drop');
   const seedTables = interaction.options.getBoolean('seed');

@@ -1,12 +1,13 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { Potion } from '~/db/models/Potion';
-import { checkUserRole, createItemEmbed, randomInt, rarityChoices } from '~/helpers';
+import { createItemEmbed, randomInt, rarityChoices } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: 'generatepotion',
   description: 'Generate a random potion by rarity',
   category: 'items',
+  requiredRole: [Roles.GM, Roles.DM],
   options: [
     {
       name: 'rarity',
@@ -25,13 +26,6 @@ async function getRandomPotionByRarity(rarity: string): Promise<Potion | null> {
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, [Roles.GM, Roles.DM])) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
 
   const rarity = interaction.options.getString('rarity', true);
 

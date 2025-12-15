@@ -26,14 +26,6 @@ async function getRandomMetalByRarity(rarity: string): Promise<Metal | null> {
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  // if (!checkUserRole(interaction, [Roles.GM, Roles.DM])) {
-  //   await interaction.reply({
-  //     content: 'You do not have permission to use this command.',
-  //     flags: MessageFlags.Ephemeral,
-  //   });
-  //   return;
-  // }
-
   const rarity = interaction.options.getString('rarity', true);
 
   const metal = await getRandomMetalByRarity(rarity);

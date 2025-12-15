@@ -1,11 +1,12 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { LastWeeklyRunTime } from '~/db/models/LastWeeklyRunTime';
-import { CommandData } from '~/types';
+import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: 'pauseweekly',
   description: 'Pauses weekly tasks',
   category: 'utility',
+  requiredRole: Roles.GM,
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {

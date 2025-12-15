@@ -1,12 +1,13 @@
 import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Boat, Shipment } from '~/db/models/Boat';
-import { createBoatStatusDescription, tableToGenerateChoices, generateShipmentItems, checkUserRole } from '~/helpers';
+import { createBoatStatusDescription, tableToGenerateChoices, generateShipmentItems } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: 'addboat',
   description: 'Add a new boat to the database',
   category: 'boats',
+  requiredRole: Roles.GM,
   options: [
     { name: 'name', type: 'string', description: 'Boat name', required: true },
     { name: 'waittime', type: 'integer', description: 'Weeks at sea', required: true },
@@ -33,13 +34,6 @@ const commandData: CommandData = {
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, Roles.GM)) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
   const boatName = interaction.options.getString('name', true);
   const city = interaction.options.getString('city', false);
   const country = interaction.options.getString('country', false);

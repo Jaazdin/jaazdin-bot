@@ -1,11 +1,12 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { CommandData } from '~/types';
+import { CommandData, Roles } from '~/types';
 import { executeWeeklyTasks } from '~/weeklies/weekly';
 
 const commandData: CommandData = {
   name: 'triggerweeklies',
   description: 'Triggers the weekly tasks',
   category: 'utility',
+  requiredRole: Roles.GM,
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {

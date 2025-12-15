@@ -3,12 +3,13 @@ import { Ingredient } from '~/db/models/Ingredient';
 import { writeFile } from 'fs/promises';
 import { resolve } from 'path';
 
-import { CommandData } from '~/types';
+import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: 'exportkitchen',
   description: 'Save the kitchen to a JSON file',
   category: 'fun',
+  requiredRole: [Roles.GM, Roles.BOT_DEV],
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {

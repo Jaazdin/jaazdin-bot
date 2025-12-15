@@ -1,5 +1,4 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { checkUserRole } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 import { executeWeeklyTasks } from '~/weeklies/weekly';
 
@@ -7,16 +6,10 @@ const commandData: CommandData = {
   name: 'repostweekly',
   description: 'Repost the weekly downtime message',
   category: 'utility',
+  requiredRole: [Roles.GM, Roles.BOT_DEV],
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, [Roles.GM, Roles.BOT_DEV])) {
-    await interaction.reply({
-      content: `You do not have permission to use this command.`,
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
   try {
     const result = await executeWeeklyTasks(true);
     if (result === 2) {

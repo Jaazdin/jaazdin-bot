@@ -208,7 +208,13 @@ async function execute(interaction: ChatInputCommandInteraction) {
   for (const [category, cmds] of Object.entries(commandsByCategory)) {
     const commandList = cmds
       .sort((a, b) => a.name.localeCompare(b.name))
-      .map((cmd) => `\`/${cmd.name}\` - ${cmd.description}`)
+      .map((cmd) => {
+        const aliases = cmd.alias 
+          ? `, ${Array.isArray(cmd.alias) ? cmd.alias.map(a => `/${a}`).join(', ') : `/${cmd.alias}`}` 
+          : '';
+        const cmdLine = `\`/${cmd.name}${aliases}\` - ${cmd.description}`;
+        return cmdLine;
+      })
       .join('\n');
 
     const fieldName = `${categoryEmojis[category]} ${category.charAt(0).toUpperCase() + category.slice(1)} (${cmds.length})`;
@@ -227,7 +233,10 @@ async function execute(interaction: ChatInputCommandInteraction) {
       let partNumber = 1;
 
       for (const cmd of cmds.sort((a, b) => a.name.localeCompare(b.name))) {
-        const cmdLine = `\`/${cmd.name}\` - ${cmd.description}\n`;
+        const aliases = cmd.alias 
+          ? `, ${Array.isArray(cmd.alias) ? cmd.alias.map(a => `/${a}`).join(', ') : `/${cmd.alias}`}` 
+          : '';
+        const cmdLine = `\`/${cmd.name}${aliases}\` - ${cmd.description}`;
 
         if (currentFieldValue.length + cmdLine.length > 1024) {
           currentEmbed.addFields({

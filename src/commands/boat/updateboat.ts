@@ -7,7 +7,6 @@ import {
   generateShipmentItems,
   boatAtSeaEmbedBuilder,
   tableToGenerateChoices,
-  checkUserRole,
   parseChangeString,
 } from '~/helpers';
 import { CommandData, Roles } from '~/types';
@@ -16,6 +15,7 @@ const commandData: CommandData = {
   name: 'updateboat',
   description: 'Update properties of an existing boat',
   category: 'boats',
+  requiredRole: Roles.GM,
   options: [
     { name: 'name', type: 'string', description: 'Boat name (required)', required: true, autocomplete: true },
     { name: 'city', type: 'string', description: 'City of origin' },
@@ -139,13 +139,6 @@ async function handleShipmentUpdate(boat: Boat, updates: Partial<Boat>): Promise
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, Roles.GM)) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
 
   const boatName = interaction.options.getString('name', true);
 

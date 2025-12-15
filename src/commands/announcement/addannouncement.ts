@@ -9,7 +9,7 @@ import {
   MessageFlags,
 } from 'discord.js';
 import { Announcement } from '~/db/models/Announcement';
-import { checkUserRole, showAnnouncement } from '~/helpers';
+import { showAnnouncement } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const CHANNEL_ID = process.env.BOT_CHANNEL_ID;
@@ -18,6 +18,7 @@ const commandData: CommandData = {
   name: 'addannouncement',
   description: 'Make a new announcement',
   category: 'announcement',
+  requiredRole: Roles.GM,
   options: [
     { name: 'weeks', type: 'integer', description: 'Weeks remaining (min 1)', required: true, minValue: 1 },
     { name: 'post_now', type: 'boolean', description: 'Post announcement immediately' },
@@ -25,15 +26,6 @@ const commandData: CommandData = {
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  // Only allow GMs to use this command
-  if (!checkUserRole(interaction, Roles.GM)) {
-    await interaction.reply({
-      content: 'Only GMs can make announcements.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
   // Get weeks and post_now from command
   const weeks = interaction.options.getInteger('weeks', true);
   const post_now = interaction.options.getBoolean('post_now') ?? false;

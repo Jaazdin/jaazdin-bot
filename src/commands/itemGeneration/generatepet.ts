@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { Pet } from '~/db/models/Pet';
 import { Op } from 'sequelize';
-import { checkUserRole, createItemEmbed, creatureTypeChoices, randomInt, rarityChoices } from '~/helpers';
+import { createItemEmbed, creatureTypeChoices, randomInt, rarityChoices } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 // Rarity boundaries by CR
@@ -17,6 +17,7 @@ const commandData: CommandData = {
   name: 'generatepet',
   description: 'Generate a random pet by rarity and creature type',
   category: 'items',
+  requiredRole: [Roles.GM, Roles.DM],
   options: [
     {
       name: 'rarity',
@@ -36,13 +37,6 @@ const commandData: CommandData = {
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, [Roles.GM, Roles.DM])) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
 
   const rarity = interaction.options.getString('rarity', true);
   const creatureType = interaction.options.getString('creaturetype', true);

@@ -1,5 +1,4 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { checkUserRole } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 import { exec } from 'child_process';
 
@@ -7,16 +6,10 @@ const commandData: CommandData = {
   name: 'codeupdate',
   description: 'Updates the bot code and restarts',
   category: 'utility',
+  requiredRole: Roles.BOT_DEV,
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  if (!checkUserRole(interaction, Roles.BOT_DEV)) {
-    await interaction.reply({
-      content: 'You do not have permission to use this command.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
   console.log('Update command invoked by', interaction.user.tag);
   await interaction.reply({
     content: 'Updating...',

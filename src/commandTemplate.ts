@@ -1,12 +1,13 @@
 import { ChatInputCommandInteraction, AutocompleteInteraction } from 'discord.js';
 
-import { CommandData } from '~/types';
+import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
   name: '',
   alias: '', // Optional, can also be an array of strings
   description: '',
   category: '',
+  requiredRole: Roles.GM, // Optional, remove if not needed. Can also be an array of Roles
   options: [
     // Define command options here. If none, remove options property.
   ],
