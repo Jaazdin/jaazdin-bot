@@ -681,46 +681,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
     // Format the roll results
     const formattedResults = formatAllComponents(parsedComponents, components);
 
-    // Create calculation breakdown
-    const calculationParts: string[] = [];
-    let rollIndex = 0;
-
-    for (const comp of components) {
-      if (comp.type === 'dice') {
-        // Collect rolls for this dice component
-        const diceRolls: RollResult[] = [];
-        const parsed = parseDiceComponent(comp.value);
-        const numDice = parseInt(parsed.numDice);
-
-        // Get initial dice rolls
-        for (let i = 0; i < numDice && rollIndex < parsedComponents.length; i++) {
-          const item = parsedComponents[rollIndex];
-          if ('value' in item && typeof item.value === 'number') {
-            diceRolls.push(item as RollResult);
-          }
-          rollIndex++;
-        }
-
-        // Get any additional rolls (exploded, rerolled, etc.)
-        while (rollIndex < parsedComponents.length) {
-          const item = parsedComponents[rollIndex];
-          if ('value' in item && typeof item.value === 'number' && !('type' in item)) {
-            diceRolls.push(item as RollResult);
-            rollIndex++;
-          } else {
-            break;
-          }
-        }
-
-        const diceTotal = calculateDiceTotal(diceRolls);
-        calculationParts.push(diceTotal.toString());
-      } else {
-        calculationParts.push(comp.value);
-      }
-    }
-
-    const calculation = calculationParts.join(' ');
-
     // Determine embed color based on result
     let color = 0x3498db; // Default blue
     if (total >= 20) {
@@ -746,15 +706,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
           inline: false,
         }
       );
-
-    // Only add calculation field if it contains operators (not just a single number)
-    if (!/^\d+(\.\d+)?$/.test(calculation.trim())) {
-      embed.addFields({
-        name: '📊 Calculation',
-        value: `\`${calculation}\``,
-        inline: false,
-      });
-    }
 
     embed.addFields({
       name: '🎯 Total',

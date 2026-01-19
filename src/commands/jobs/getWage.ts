@@ -23,6 +23,12 @@ const commandData: CommandData = {
       minValue: -4,
       maxValue: 30,
     },
+        {
+      name: 'has_proficiency',
+      type: 'boolean',
+      description: 'Whether you have the associated proficiency',
+      required: true,
+    },
     {
       name: 'item_bonus',
       type: 'integer',
@@ -30,11 +36,6 @@ const commandData: CommandData = {
       minValue: 1,
     },
     { name: 'flat_bonus', type: 'string', description: 'The flat bonus (Boats, festivals, etc)' },
-    {
-      name: 'has_proficiency',
-      type: 'boolean',
-      description: 'Whether you have the associated proficiency',
-    },
   ],
 };
 
