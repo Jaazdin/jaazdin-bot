@@ -72,7 +72,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
   const type = interaction.options.getString('type')?.toLowerCase();
   const discordId = (interaction.options.getUser('player') || interaction.user).id;
   const char = interaction.options.getString('character')?.toLowerCase();
-  const repeatable = interaction.options.getBoolean('repeatable') || false;
+  let repeatable = interaction.options.getBoolean('repeatable');
   //todo check to see if timer name doesn't already exist.
 
   if (!name || !weeks || !type || !char) {
@@ -102,13 +102,17 @@ async function execute(interaction: ChatInputCommandInteraction) {
     return interaction.reply(`Character name must be ${CHAR_MAX_LENGTH} characters or less.`);
   }
 
+  if (type === TimerType.plant && repeatable == undefined) {
+    repeatable = true; // Plants are repeatable by default
+  }
+
   await Timer.create({
     name: name,
     type: type as TimerType,
     weeks_remaining: weeks,
     user: discordId,
     character: char,
-    repeatable: repeatable,
+    repeatable: repeatable || false,
     repeat_weeks: repeatable ? weeks : undefined,
   });
 
