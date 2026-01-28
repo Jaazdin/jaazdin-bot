@@ -1,7 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
 import { db } from 'db/db';
-import fs from 'fs/promises';
-import path from 'path';
 
 export class Job extends Model {
   declare id: number;
@@ -75,26 +73,28 @@ Job.hasMany(JobTier, {
 });
 
 JobTier.belongsTo(Job);
-
-async function seed() {
+async function seed(job?: string) {
   // Reading each file in d100tables and set them to create the objects.
-  const d100TablesDir = path.join(__dirname, '../../d100tables');
+  const d100TablesDir = `${import.meta.dir}/../../d100tables`;
   try {
-    const d100Jobs = await fs.readdir(d100TablesDir);
+    const d100Jobs = await Array.fromAsync(new Bun.Glob('*.json').scan(d100TablesDir));
 
     for (const file of d100Jobs) {
+      if (job && file.split('.')[0].toLowerCase() !== job.toLowerCase()) {
+        continue;
+      }
       //confirming that the file is .json
       if (!file.endsWith('.json')) continue;
       let jobName = file.split('.')[0].toLowerCase();
       jobName = jobName.replace('-', ' ');
       //read in json file.
       const jobJson: JobTierData[] = (await import(`${d100TablesDir}/${file}`)).default;
-      const job = await Job.create({
+      const dbJob = await Job.create({
         name: jobName,
       });
       for (const tier of jobJson) {
         await JobTier.create({
-          job_id: job.getDataValue('id'),
+          job_id: dbJob.getDataValue('id'),
           bonus: tier.bonus,
           roll_min: tier.roll.min,
           roll_max: tier.roll.max,
