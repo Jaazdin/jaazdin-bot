@@ -7,14 +7,14 @@
     }
   },
   {
-    "bonus": "Find a Common seed.",
+    "bonus": "Find Common Seed or increase a plots Enrichment by 10.",
     "roll": {
       "min": 21,
       "max": 40
     }
   },
   {
-    "bonus": "Find an Uncommon seed.",
+    "bonus": "Find Uncommon Seed or increase a plots Enrichment by 15.",
     "roll": {
       "min": 41,
       "max": 55
@@ -28,21 +28,21 @@
     }
   },
   {
-    "bonus": "Find a Rare seed.",
+    "bonus": "Find Rare Seed or increase a plots Enrichment by 20.",
     "roll": {
       "min": 71,
       "max": 85
     }
   },
   {
-    "bonus": "Speed up any Plant by 1 week, by two weeks if you are proficient in Nature or Survival, by 3 weeks if you are proficient in both or have expertise in either.",
+    "bonus": "You can immediately make a Nature/Arcana/Religion check to enrich a plot with a bonus equal to your Job Tier.",
     "roll": {
       "min": 86,
       "max": 95
     }
   },
   {
-    "bonus": "Find a Very Rare seed.",
+    "bonus": "Find Very Rare Seed or increase a plots Enrichment by 25.",
     "roll": {
       "min": 96,
       "max": 105
@@ -56,7 +56,7 @@
     }
   },
   {
-    "bonus": "Immediately gain a harvest of one of your plants with 2 or less weeks of growth time left, this does not reset the harvest timer.",
+    "bonus": "You can immediately make a Nature/Arcana/Religion check to enrich a plot with a bonus equal to your Job Tier. You can apply this bonus to two different plots or the same one twice.",
     "roll": {
       "min": 116,
       "max": 125
@@ -70,7 +70,7 @@
     }
   },
   {
-    "bonus": "Find a Legendary seed.",
+    "bonus": "Find Legendary Seed or increase a plots Enrichment by 30.",
     "roll": {
       "min": 136,
       "max": 300
