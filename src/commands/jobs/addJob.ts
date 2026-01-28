@@ -37,8 +37,6 @@ async function autocomplete(interaction: AutocompleteInteraction) {
   const d100Jobs = d100JobFiles.map((file) => {
     return file.replace('.json', '').toLocaleLowerCase();
   });
-  console.log('D100 Jobs for autocomplete:', d100Jobs);
-  console.log('Exclude list for autocomplete:', exclude);
   await interaction.respond(
     d100Jobs
       .filter(

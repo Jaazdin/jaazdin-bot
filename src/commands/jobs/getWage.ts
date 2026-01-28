@@ -23,7 +23,7 @@ const commandData: CommandData = {
       minValue: -4,
       maxValue: 30,
     },
-        {
+    {
       name: 'has_proficiency',
       type: 'boolean',
       description: 'Whether you have the associated proficiency',

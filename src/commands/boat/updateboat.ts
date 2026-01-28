@@ -139,7 +139,6 @@ async function handleShipmentUpdate(boat: Boat, updates: Partial<Boat>): Promise
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-
   const boatName = interaction.options.getString('name', true);
 
   // Use helper to find boat with error handling

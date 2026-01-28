@@ -209,8 +209,8 @@ async function execute(interaction: ChatInputCommandInteraction) {
     const commandList = cmds
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((cmd) => {
-        const aliases = cmd.alias 
-          ? `, ${Array.isArray(cmd.alias) ? cmd.alias.map(a => `/${a}`).join(', ') : `/${cmd.alias}`}` 
+        const aliases = cmd.alias
+          ? `, ${Array.isArray(cmd.alias) ? cmd.alias.map((a) => `/${a}`).join(', ') : `/${cmd.alias}`}`
           : '';
         const cmdLine = `\`/${cmd.name}${aliases}\` - ${cmd.description}`;
         return cmdLine;
@@ -233,8 +233,8 @@ async function execute(interaction: ChatInputCommandInteraction) {
       let partNumber = 1;
 
       for (const cmd of cmds.sort((a, b) => a.name.localeCompare(b.name))) {
-        const aliases = cmd.alias 
-          ? `, ${Array.isArray(cmd.alias) ? cmd.alias.map(a => `/${a}`).join(', ') : `/${cmd.alias}`}` 
+        const aliases = cmd.alias
+          ? `, ${Array.isArray(cmd.alias) ? cmd.alias.map((a) => `/${a}`).join(', ') : `/${cmd.alias}`}`
           : '';
         const cmdLine = `\`/${cmd.name}${aliases}\` - ${cmd.description}`;
 

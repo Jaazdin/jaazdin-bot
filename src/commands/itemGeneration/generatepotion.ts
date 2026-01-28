@@ -26,7 +26,6 @@ async function getRandomPotionByRarity(rarity: string): Promise<Potion | null> {
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-
   const rarity = interaction.options.getString('rarity', true);
 
   const potion = await getRandomPotionByRarity(rarity);

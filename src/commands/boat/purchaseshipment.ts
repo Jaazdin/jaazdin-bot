@@ -14,7 +14,6 @@ const commandData: CommandData = {
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
-
   const boatName = interaction.options.getString('boat', true);
   const itemName = interaction.options.getString('item', true);
 

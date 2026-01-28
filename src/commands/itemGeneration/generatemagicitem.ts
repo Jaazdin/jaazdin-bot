@@ -51,7 +51,6 @@ async function getRandomMagicItemByRarity(rarity: string): Promise<MagicItem | n
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-
   const table = interaction.options.getString('table', true);
 
   const item = await getRandomMagicItemByTable(table);

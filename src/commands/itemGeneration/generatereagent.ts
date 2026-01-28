@@ -27,7 +27,6 @@ const commandData: CommandData = {
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
-
   const rarity = interaction.options.getString('rarity', true);
   const creatureType = interaction.options.getString('creaturetype', true);
 

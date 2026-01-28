@@ -33,7 +33,6 @@ export async function generateRandomArmorWithMetalByRarity(rarity: string) {
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-
   const rarity = interaction.options.getString('rarity', true);
 
   const result = await generateRandomArmorWithMetalByRarity(rarity);

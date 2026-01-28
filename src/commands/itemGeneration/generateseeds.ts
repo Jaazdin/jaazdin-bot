@@ -29,7 +29,6 @@ async function getRandomSeedByRarity(rarity: string): Promise<Seed | null> {
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-
   const rarity = interaction.options.getString('rarity', true);
 
   const seed = await getRandomSeedByRarity(rarity);

@@ -32,7 +32,6 @@ async function generateRandomWeaponWithMetalByRarity(rarity: string) {
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-
   const rarity = interaction.options.getString('rarity', true);
 
   const result = await generateRandomWeaponWithMetalByRarity(rarity);

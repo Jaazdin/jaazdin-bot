@@ -26,7 +26,6 @@ async function getRandomPoisonByRarity(rarity: string): Promise<Poison | null> {
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
-
   const rarity = interaction.options.getString('rarity', true);
 
   // const poison = await getRandomItemByRarity<Poison>('~/db/models/Poison', rarity);
