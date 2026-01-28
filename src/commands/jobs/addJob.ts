@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, AutocompleteInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, AutocompleteInteraction, MessageFlags } from 'discord.js';
 import { Job, seed } from '~/db/models/Job';
 import { formatNames } from '~/helpers';
 import { CommandData, Roles } from '~/types';
@@ -24,7 +24,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
   // Command execution logic here
   const jobName = interaction.options.getString('job_name', true);
   await seed(jobName);
-  await interaction.reply({ content: `Job "${jobName}" has been added to the database.`, ephemeral: true });
+  await interaction.reply({ content: `Job "${jobName}" has been added to the database.`, flags: MessageFlags.Ephemeral });
 }
 
 // Remove if not needed
