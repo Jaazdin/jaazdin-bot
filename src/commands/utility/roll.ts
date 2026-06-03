@@ -22,6 +22,7 @@ type RollModifier = {
   type: 'r' | 'rr' | 'k' | 'kh' | 'kl' | 'd' | 'dl' | 'dh' | 'x' | 'xo' | 'min' | 'max';
   value: number;
   comparison: '<' | '<=' | '>' | '>=' | '=';
+  cap?: number;
 };
 
 const commandData: CommandData = {
@@ -43,7 +44,8 @@ const ModifierPriority = ['r', 'rr', 'k', 'kh', 'kl', 'd', 'dl', 'dh', 'x', 'xo'
 
 function splitFormulaComponents(formula: string): FormulaComponent[] {
   const cleanFormula = formula.replace(/\s+/g, '');
-  const componentPattern = /(\d*d\d+(?:(?:rr|r|xo|x|kh|kl|k|dl|dh|d|min|max)(?:>=|<=|>|<|=)?\d*)*|[+\-*/()]|\d+)/g;
+  const componentPattern =
+    /(\d*d\d+(?:(?:rr|r|xo|x|kh|kl|k|dl|dh|d|min|max)(?:\d+(?=>=|<=|>|<|=))?(?:>=|<=|>|<|=)?\d*)*|[+\-*/()]|\d+)/g;
   const componentMatch = cleanFormula.match(componentPattern);
 
   if (!componentMatch) {
@@ -92,14 +94,15 @@ function parseDiceComponent(component: string): ParsedDieComponent {
   const dieSize = baseDiceMatch[2];
   const afterDiceIndex = baseDiceMatch.index! + baseDiceMatch[0].length;
   const modifierSection = component.substring(afterDiceIndex);
-  const modifierPattern = /(rr|r|xo|x|kh|kl|k|dl|dh|d|min|max)(>=|<=|>|<|=)?(\d*)/g;
+  const modifierPattern = /(rr|r|xo|x|kh|kl|k|dl|dh|d|min|max)(\d+(?=>=|<=|>|<|=))?(>=|<=|>|<|=)?(\d*)/g;
   const modifiers: RollModifier[] = [];
 
   let modifierMatch;
   while ((modifierMatch = modifierPattern.exec(modifierSection)) !== null) {
     const modifierType = modifierMatch[1] as RollModifier['type'];
-    const comparison = modifierMatch[2] as RollModifier['comparison'];
-    const valueStr = modifierMatch[3];
+    const capStr = modifierMatch[2];
+    const comparison = modifierMatch[3] as RollModifier['comparison'];
+    const valueStr = modifierMatch[4];
 
     let value: number;
     if (valueStr === '' && ['kh', 'dh', 'kl', 'dl'].includes(modifierType)) {
@@ -110,10 +113,13 @@ function parseDiceComponent(component: string): ParsedDieComponent {
       value = parseInt(valueStr);
     }
 
+    const cap = capStr && ['x', 'xo'].includes(modifierType) ? parseInt(capStr) : undefined;
+
     modifiers.push({
       type: modifierType,
       comparison: comparison,
       value: value,
+      cap: cap,
     });
   }
 
@@ -179,15 +185,18 @@ function processRerolls(
     i++; // Move index to account for the newly added roll
 
     if (mod.type === 'r') {
-      break; // Single reroll only
+      continue; // Single reroll per die — continue to check remaining dice
     }
 
-    // Recursive reroll for 'rr' type
-    if (compareValues(newRoll, comparison, threshold)) {
-      const recursiveRolls = evaluateModifiers([{ value: newRoll }], [mod], dieSize, recursionDepth + 1);
-      rollsArray.push(...recursiveRolls);
+    // Iterative recursive reroll for 'rr' type — keep rerolling the new result while it qualifies
+    let currentRoll = newRoll;
+    while (compareValues(currentRoll, comparison, threshold)) {
+      const nextRoll = rollDie(dieSize);
+      rollsArray.splice(i + 1, 0, { value: nextRoll });
+      rollsArray[i].modifier = 'drop';
+      i++;
+      currentRoll = nextRoll;
     }
-    break;
   }
 
   if (iterations >= MAX_ITERATIONS) {
@@ -330,7 +339,7 @@ function processExplodes(
     // For 'x' type - handle explosion chain iteratively
     let currentRoll = roll.value;
     let explosionCount = 0;
-    const MAX_EXPLOSIONS = 20; // Prevent infinite explosion chains
+    const MAX_EXPLOSIONS = mod.cap ?? 20; // Use cap if specified, otherwise default safety limit
 
     while (compareValues(currentRoll, comparison, threshold) && explosionCount < MAX_EXPLOSIONS) {
       const newRoll = rollDie(dieSize);
@@ -345,7 +354,7 @@ function processExplodes(
       }
     }
 
-    if (explosionCount >= MAX_EXPLOSIONS) {
+    if (mod.cap === undefined && explosionCount >= MAX_EXPLOSIONS) {
       throw new Error(`Max explosion chain reached for d${dieSize}`);
     }
   }
@@ -413,9 +422,6 @@ function validateModifiers(modifiers: RollModifier[], dieSize: number) {
       if (isNaN(value) || value < 1 || value > dieSize) {
         throw new Error(`Invalid ${type} value: ${value} for d${dieSize}`);
       }
-      if (!mod.comparison) {
-        mod.comparison = '='; // Default comparison for min/max
-      }
     }
 
     if (['x', 'xo'].includes(type)) {
@@ -424,6 +430,9 @@ function validateModifiers(modifiers: RollModifier[], dieSize: number) {
       }
       if (!mod.comparison) {
         mod.comparison = '='; // Default comparison for explode
+      }
+      if (mod.cap !== undefined && (isNaN(mod.cap) || mod.cap < 1)) {
+        throw new Error(`Invalid explode cap: ${mod.cap}. Must be a positive integer.`);
       }
     }
   }
@@ -648,7 +657,7 @@ function evaluateExpression(expression: string): number {
 async function execute(interaction: ChatInputCommandInteraction) {
   const formula = interaction.options.getString('formula', true).toLowerCase();
 
-  if (!/^[1-9]\d*|d/.test(formula)) {
+  if (!/^([1-9]\d*|d)/.test(formula)) {
     const errorEmbed = new EmbedBuilder()
       .setTitle('❌ Invalid Formula')
       .setDescription("Formula must start with an integer greater than 0 or 'd'.")
@@ -681,15 +690,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
     // Format the roll results
     const formattedResults = formatAllComponents(parsedComponents, components);
 
-    // Determine embed color based on result
-    let color = 0x3498db; // Default blue
-    if (total >= 20) {
-      color = 0x2ecc71; // Green for high rolls
-    } else if (total <= 5) {
-      color = 0xe74c3c; // Red for low rolls
-    } else if (total >= 15) {
-      color = 0xf39c12; // Orange for good rolls
-    }
+    const color = 0x3498db;
 
     const embed = new EmbedBuilder()
       .setTitle('🎲 Dice Roll Results')
