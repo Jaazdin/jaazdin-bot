@@ -7,13 +7,21 @@ const commandData: CommandData = {
   description: 'Calculate your wage formula',
   category: 'jobs',
   options: [
-    { name: 'tier', type: 'integer', description: 'The tier of the job (1-30)', required: true },
+    {
+      name: 'tier',
+      type: 'integer',
+      description: 'The tier of the job (1-30)',
+      required: true,
+    },
     {
       name: 'die',
       type: 'string',
       description: 'The wage die (d4, d6, d8, d10, d12)',
       required: true,
-      choices: ['d4', 'd6', 'd8', 'd10', 'd12'].map((die) => ({ name: die, value: die })),
+      choices: ['d4', 'd6', 'd8', 'd10', 'd12'].map((die) => ({
+        name: die,
+        value: die,
+      })),
     },
     {
       name: 'skill_bonus',
@@ -35,7 +43,11 @@ const commandData: CommandData = {
       description: 'The item bonus (+1 tools, luckstone, etc)',
       minValue: 1,
     },
-    { name: 'flat_bonus', type: 'string', description: 'The flat bonus (Boats, festivals, etc)' },
+    {
+      name: 'flat_bonus',
+      type: 'string',
+      description: 'The flat bonus (Boats, festivals, etc)',
+    },
   ],
 };
 
@@ -91,7 +103,11 @@ async function execute(interaction: ChatInputCommandInteraction) {
         title: 'Wage Calculation',
         description: `Your wage formula is: \`\`\`!r ${wageFormula}\`\`\``,
         fields: [
-          { name: 'Breakdown', value: `${dieString} ${totalBonusString || 'No bonuses applied'}`, inline: false },
+          {
+            name: 'Breakdown',
+            value: `${dieString} ${totalBonusString || 'No bonuses applied'}`,
+            inline: false,
+          },
         ],
         color: 0x00ff00,
       },

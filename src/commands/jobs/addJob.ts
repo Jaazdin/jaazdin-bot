@@ -24,7 +24,10 @@ async function execute(interaction: ChatInputCommandInteraction) {
   // Command execution logic here
   const jobName = interaction.options.getString('job_name', true);
   await seed(jobName);
-  await interaction.reply({ content: `Job "${jobName}" has been added to the database.`, flags: MessageFlags.Ephemeral });
+  await interaction.reply({
+    content: `Job "${jobName}" has been added to the database.`,
+    flags: MessageFlags.Ephemeral,
+  });
 }
 
 // Remove if not needed

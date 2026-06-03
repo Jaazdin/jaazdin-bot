@@ -124,7 +124,9 @@ export function createTimerEmbed(sortedTimers: SortedTimers, showComplete: boole
   // Handle completed timers
   if (showComplete && sortedTimers.complete && Object.keys(sortedTimers.complete).length > 0) {
     // Group completed timers by type
-    const completedTimersByType: { [key in TimerType]?: Timer['dataValues'][] } = {};
+    const completedTimersByType: {
+      [key in TimerType]?: Timer['dataValues'][];
+    } = {};
 
     for (const [userId, timers] of Object.entries(sortedTimers.complete)) {
       for (const timer of timers) {
@@ -230,15 +232,24 @@ async function execute(interaction: ChatInputCommandInteraction) {
   const embedMessages = createTimerEmbed(sortedTimers, false);
 
   if (embedMessages.length === 0 || embedMessages[0].length === 0) {
-    return interaction.reply({ content: 'No timers found.', flags: MessageFlags.Ephemeral });
+    return interaction.reply({
+      content: 'No timers found.',
+      flags: MessageFlags.Ephemeral,
+    });
   }
 
   // Send the first message as a reply
-  await interaction.reply({ embeds: embedMessages[0], flags: MessageFlags.Ephemeral });
+  await interaction.reply({
+    embeds: embedMessages[0],
+    flags: MessageFlags.Ephemeral,
+  });
 
   // Send additional messages as follow-ups if needed
   for (let i = 1; i < embedMessages.length; i++) {
-    await interaction.followUp({ embeds: embedMessages[i], flags: MessageFlags.Ephemeral });
+    await interaction.followUp({
+      embeds: embedMessages[i],
+      flags: MessageFlags.Ephemeral,
+    });
   }
 }
 

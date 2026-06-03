@@ -9,7 +9,9 @@ export async function findReligionByName(
   interaction: ChatInputCommandInteraction,
   name: string
 ): Promise<Religion | null> {
-  const religion = await Religion.findOne({ where: { name: name.toLowerCase() } });
+  const religion = await Religion.findOne({
+    where: { name: name.toLowerCase() },
+  });
 
   if (!religion) {
     await interaction.reply({
@@ -26,7 +28,9 @@ export async function findReligionByName(
  * Check if a religion name already exists
  */
 export async function checkReligionExists(interaction: ChatInputCommandInteraction, name: string): Promise<boolean> {
-  const existingReligion = await Religion.findOne({ where: { name: name.toLowerCase() } });
+  const existingReligion = await Religion.findOne({
+    where: { name: name.toLowerCase() },
+  });
 
   if (existingReligion) {
     await interaction.reply({

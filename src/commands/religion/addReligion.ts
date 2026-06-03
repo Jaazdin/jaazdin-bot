@@ -41,7 +41,9 @@ async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
 
-  const domainData = await Domain.findOne({ where: { name: domain.toLowerCase() } });
+  const domainData = await Domain.findOne({
+    where: { name: domain.toLowerCase() },
+  });
   if (!domainData) {
     await interaction.reply({
       content: `Domain "${domain}" not found.`,

@@ -9,11 +9,33 @@ const commandData: CommandData = {
   category: 'boats',
   requiredRole: Roles.GM,
   options: [
-    { name: 'boat', type: 'string', description: 'Boat name', required: true, autocomplete: true },
-    { name: 'item', type: 'string', description: 'Item name', required: true, autocomplete: true },
-    { name: 'type', type: 'string', description: 'Item type', required: true, autocomplete: true },
+    {
+      name: 'boat',
+      type: 'string',
+      description: 'Boat name',
+      required: true,
+      autocomplete: true,
+    },
+    {
+      name: 'item',
+      type: 'string',
+      description: 'Item name',
+      required: true,
+      autocomplete: true,
+    },
+    {
+      name: 'type',
+      type: 'string',
+      description: 'Item type',
+      required: true,
+      autocomplete: true,
+    },
     { name: 'price', type: 'integer', description: 'New item price (gp)' },
-    { name: 'quantity', type: 'string', description: 'New quantity (+x, -x, =x' },
+    {
+      name: 'quantity',
+      type: 'string',
+      description: 'New quantity (+x, -x, =x',
+    },
   ],
 };
 

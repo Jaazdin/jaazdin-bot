@@ -60,7 +60,9 @@ async function postMessages(messages: EmbedBuilder[][], usersWithCompletedTimers
       return;
     }
     for (let i = 0; i < embeds.length; i += 10) {
-      const messageOptions: MessageCreateOptions = { embeds: embeds.slice(i, i + 10) };
+      const messageOptions: MessageCreateOptions = {
+        embeds: embeds.slice(i, i + 10),
+      };
 
       // Add the ping message to the first batch of embeds
       if (messageIndex === 0 && messageContent) {

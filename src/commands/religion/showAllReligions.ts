@@ -16,7 +16,9 @@ async function execute(interaction: ChatInputCommandInteraction) {
 }
 
 async function showAllReligions(): Promise<EmbedBuilder[]> {
-  const religions = await Religion.findAll({ order: [['follower_count', 'DESC']] });
+  const religions = await Religion.findAll({
+    order: [['follower_count', 'DESC']],
+  });
   const embeds: EmbedBuilder[] = [];
   if (religions.length === 0) {
     // 🪦 Tombstone emoji for no religions

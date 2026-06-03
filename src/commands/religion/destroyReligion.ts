@@ -32,7 +32,9 @@ async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
 
-  const domain = await Domain.findOne({ where: { id: religion.dataValues.domain_id } });
+  const domain = await Domain.findOne({
+    where: { id: religion.dataValues.domain_id },
+  });
 
   if (!domain) {
     await interaction.reply({

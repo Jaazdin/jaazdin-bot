@@ -75,7 +75,11 @@ async function execute(interaction: ChatInputCommandInteraction) {
     fields: [
       { name: 'Name', value: formatNames(timer.name), inline: true },
       { name: 'Character', value: formatNames(timer.character), inline: true },
-      { name: 'Weeks Remaining', value: timer.weeks_remaining.toString(), inline: true },
+      {
+        name: 'Weeks Remaining',
+        value: timer.weeks_remaining.toString(),
+        inline: true,
+      },
       { name: 'Player', value: `<@${discordId}>`, inline: true },
     ],
     confirmEmbed: [

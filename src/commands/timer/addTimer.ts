@@ -123,11 +123,19 @@ async function execute(interaction: ChatInputCommandInteraction) {
         color: 0x4caf50,
         fields: [
           { name: 'Name', value: formatNames(name), inline: true },
-          { name: 'Type', value: `${ICON_MAP[type]} ${formatNames(type)}`, inline: true },
+          {
+            name: 'Type',
+            value: `${ICON_MAP[type]} ${formatNames(type)}`,
+            inline: true,
+          },
           { name: 'Duration', value: `🕒 ${weeks} week(s)`, inline: true },
           { name: 'Character', value: formatNames(char), inline: true },
           { name: 'Player', value: `<@${discordId}>`, inline: true },
-          { name: 'Repeatable', value: repeatable ? 'Yes' : 'No', inline: true },
+          {
+            name: 'Repeatable',
+            value: repeatable ? 'Yes' : 'No',
+            inline: true,
+          },
         ],
         timestamp: new Date().toISOString(),
         footer: { text: 'Timer successfully created!' },

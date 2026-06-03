@@ -6,7 +6,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "bun run pretty && bun --watch src/index.ts",
-    "start": "bun run pretty && bun run src/index.ts",
+    "start": "bun run src/index.ts",
     "start:prd": "bun run pretty && NODE_ENV=production bun run src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun ",
     "deploy": "bun run pretty && bun run src/helpers/deploy-commands.ts",

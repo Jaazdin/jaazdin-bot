@@ -8,8 +8,20 @@ const commandData: CommandData = {
   description: 'Purchase a shipment item from a boat (subtracts 1 from quantity, deletes if zero)',
   category: 'boats',
   options: [
-    { name: 'boat', type: 'string', description: 'Boat name', required: true, autocomplete: true },
-    { name: 'item', type: 'string', description: 'Item name', required: true, autocomplete: true },
+    {
+      name: 'boat',
+      type: 'string',
+      description: 'Boat name',
+      required: true,
+      autocomplete: true,
+    },
+    {
+      name: 'item',
+      type: 'string',
+      description: 'Item name',
+      required: true,
+      autocomplete: true,
+    },
   ],
 };
 
@@ -28,7 +40,9 @@ async function execute(interaction: ChatInputCommandInteraction) {
   }
 
   // Use boatId to find shipment
-  const shipment = await Shipment.findOne({ where: { boatId: boat.id, itemName } });
+  const shipment = await Shipment.findOne({
+    where: { boatId: boat.id, itemName },
+  });
 
   if (!shipment) {
     await interaction.reply({
@@ -68,7 +82,10 @@ async function execute(interaction: ChatInputCommandInteraction) {
 async function autocomplete(interaction: AutocompleteInteraction) {
   const focusedOption = interaction.options.getFocused(true);
   if (focusedOption.name === 'boat') {
-    await boatNameAutocomplete(interaction, { runningOnly: true, inTown: true }); // Only running boats
+    await boatNameAutocomplete(interaction, {
+      runningOnly: true,
+      inTown: true,
+    }); // Only running boats
   } else if (focusedOption.name === 'item') {
     await itemNameAutocomplete(interaction);
   }

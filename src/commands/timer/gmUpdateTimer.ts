@@ -99,9 +99,17 @@ async function execute(interaction: ChatInputCommandInteraction) {
         color: 0xff9800,
         fields: [
           { name: 'Name', value: formatNames(timer.name), inline: true },
-          { name: 'Character', value: formatNames(timer.character), inline: true },
+          {
+            name: 'Character',
+            value: formatNames(timer.character),
+            inline: true,
+          },
           { name: 'Player', value: `<@${discordId}>`, inline: true },
-          { name: 'Weeks Remaining', value: `🕒 ${timer.weeks_remaining} week(s)`, inline: true },
+          {
+            name: 'Weeks Remaining',
+            value: `🕒 ${timer.weeks_remaining} week(s)`,
+            inline: true,
+          },
         ],
         timestamp: new Date().toISOString(),
         footer: { text: 'Timer successfully updated!' },

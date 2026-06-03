@@ -148,7 +148,12 @@ export function createItemEmbed(
 }
 
 // Type definitions for shipment generation
-export type ShipmentItem = { itemName: string; price: number; quantity: number; type: string };
+export type ShipmentItem = {
+  itemName: string;
+  price: number;
+  quantity: number;
+  type: string;
+};
 type MetalPriceCache = { [metalName: string]: number };
 
 export function getTypeArray(counts: { [rarity: string]: number }): string[] {

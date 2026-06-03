@@ -17,12 +17,22 @@ const commandData: CommandData = {
   category: 'boats',
   requiredRole: Roles.GM,
   options: [
-    { name: 'name', type: 'string', description: 'Boat name (required)', required: true, autocomplete: true },
+    {
+      name: 'name',
+      type: 'string',
+      description: 'Boat name (required)',
+      required: true,
+      autocomplete: true,
+    },
     { name: 'city', type: 'string', description: 'City of origin' },
     { name: 'country', type: 'string', description: 'Country of origin' },
     { name: 'waittime', type: 'integer', description: 'Weeks at sea' },
     { name: 'timeintown', type: 'integer', description: 'Weeks in town' },
-    { name: 'tier2ability', type: 'string', description: 'Tier 2 ability description' },
+    {
+      name: 'tier2ability',
+      type: 'string',
+      description: 'Tier 2 ability description',
+    },
     {
       name: 'table',
       type: 'string',
@@ -30,8 +40,16 @@ const commandData: CommandData = {
       choices: tableToGenerateChoices,
     },
     { name: 'istier2', type: 'boolean', description: 'Is this a tier 2 boat?' },
-    { name: 'isrunning', type: 'boolean', description: 'Is this boat running?' },
-    { name: 'weeksleft', type: 'string', description: 'Weeks left (use +x, -x, =x)' },
+    {
+      name: 'isrunning',
+      type: 'boolean',
+      description: 'Is this boat running?',
+    },
+    {
+      name: 'weeksleft',
+      type: 'string',
+      description: 'Weeks left (use +x, -x, =x)',
+    },
     { name: 'isintown', type: 'boolean', description: 'Is the boat in town?' },
   ],
 };
@@ -183,7 +201,10 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
     await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
   } catch (error) {
-    await interaction.reply({ content: `Failed to update boat: ${error}`, flags: MessageFlags.Ephemeral });
+    await interaction.reply({
+      content: `Failed to update boat: ${error}`,
+      flags: MessageFlags.Ephemeral,
+    });
   }
 }
 

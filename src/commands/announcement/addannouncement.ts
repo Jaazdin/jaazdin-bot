@@ -20,8 +20,18 @@ const commandData: CommandData = {
   category: 'announcement',
   requiredRole: Roles.GM,
   options: [
-    { name: 'weeks', type: 'integer', description: 'Weeks remaining (min 1)', required: true, minValue: 1 },
-    { name: 'post_now', type: 'boolean', description: 'Post announcement immediately' },
+    {
+      name: 'weeks',
+      type: 'integer',
+      description: 'Weeks remaining (min 1)',
+      required: true,
+      minValue: 1,
+    },
+    {
+      name: 'post_now',
+      type: 'boolean',
+      description: 'Post announcement immediately',
+    },
   ],
 };
 

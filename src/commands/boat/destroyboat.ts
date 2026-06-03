@@ -7,7 +7,15 @@ const commandData: CommandData = {
   name: 'destroyboat',
   description: 'Will remove a boat from the active boats',
   category: 'boats',
-  options: [{ name: 'name', type: 'string', description: 'The name of the boat', required: true, autocomplete: true }],
+  options: [
+    {
+      name: 'name',
+      type: 'string',
+      description: 'The name of the boat',
+      required: true,
+      autocomplete: true,
+    },
+  ],
   requiredRole: Roles.GM,
 };
 
@@ -21,7 +29,9 @@ async function execute(interaction: ChatInputCommandInteraction) {
   }
 
   // Check if boat has shipments
-  const shipments: Shipment[] = await Shipment.findAll({ where: { boatId: boat.id } });
+  const shipments: Shipment[] = await Shipment.findAll({
+    where: { boatId: boat.id },
+  });
 
   const confirmed = confirmAction({
     interaction,

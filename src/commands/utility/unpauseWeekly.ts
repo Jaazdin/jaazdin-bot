@@ -12,7 +12,10 @@ const commandData: CommandData = {
 async function execute(interaction: ChatInputCommandInteraction) {
   const lastRun = await LastWeeklyRunTime.findOne();
   if (!lastRun) {
-    await interaction.reply({ content: 'No weekly tasks have been scheduled yet.', flags: MessageFlags.Ephemeral });
+    await interaction.reply({
+      content: 'No weekly tasks have been scheduled yet.',
+      flags: MessageFlags.Ephemeral,
+    });
     throw new Error('LastWeeklyRunTime record not found.');
   }
   if (!lastRun.dataValues.paused) {

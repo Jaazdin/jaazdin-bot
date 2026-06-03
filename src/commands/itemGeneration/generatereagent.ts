@@ -53,7 +53,9 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
 // Utility function for use in other scripts
 async function getRandomReagentByRarityAndType(rarity: string, creatureType: string) {
-  const validReagents = await Reagent.findAll({ where: { rarity, type: creatureType } });
+  const validReagents = await Reagent.findAll({
+    where: { rarity, type: creatureType },
+  });
   if (validReagents.length === 0) return null;
   return validReagents[Math.floor(Math.random() * validReagents.length)];
 }

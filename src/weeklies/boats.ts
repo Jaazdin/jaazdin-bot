@@ -9,7 +9,9 @@ import { createBoatEmbed } from '~/commands/boat/showboats';
 async function update() {
   // 1. Advance all running boats by 1 week
   await Boat.update(
-    { weeksLeft: (Boat.sequelize as import('sequelize').Sequelize).literal('weeks_left - 1') },
+    {
+      weeksLeft: (Boat.sequelize as import('sequelize').Sequelize).literal('weeks_left - 1'),
+    },
     { where: { isRunning: true } }
   );
 

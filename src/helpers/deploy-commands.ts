@@ -47,7 +47,9 @@ async function deployCommands() {
 
   console.log(`Started refreshing ${builtCommands.length} application (/) commands.`);
 
-  await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: builtCommands });
+  await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+    body: builtCommands,
+  });
 
   console.log(`Successfully reloaded ${builtCommands.length} application (/) commands.`);
 }

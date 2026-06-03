@@ -103,7 +103,10 @@ async function executeSubhelp(interaction: ChatInputCommandInteraction, command:
   }
   const commandData = userCommands.find((cmd) => cmd.name === command);
   if (!commandData) {
-    await interaction.reply({ content: `❌ Command \`${command}\` not found.`, flags: MessageFlags.Ephemeral });
+    await interaction.reply({
+      content: `❌ Command \`${command}\` not found.`,
+      flags: MessageFlags.Ephemeral,
+    });
     return;
   }
 

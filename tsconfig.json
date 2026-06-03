@@ -12,11 +12,10 @@
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
     "resolveJsonModule": true,
-    "baseUrl": ".",
     "noImplicitAny": true,
     "paths": {
-      "~/*": ["src/*"],
-      "db/*": ["src/db/*"]
+      "~/*": ["./src/*"],
+      "db/*": ["./src/db/*"]
     },
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true

@@ -102,7 +102,10 @@ export async function parseChangeString(
 
   if (!match) {
     if (interaction) {
-      await interaction.reply({ content: errorMsg, flags: MessageFlags.Ephemeral });
+      await interaction.reply({
+        content: errorMsg,
+        flags: MessageFlags.Ephemeral,
+      });
     }
     return null;
   }
@@ -110,25 +113,37 @@ export async function parseChangeString(
   const value = parseInt(match[2], 10);
   if (operator === '+') {
     if (max != null && current + value > max) {
-      await interaction.reply({ content: `Cannot exceed ${max} amount.`, flags: MessageFlags.Ephemeral });
+      await interaction.reply({
+        content: `Cannot exceed ${max} amount.`,
+        flags: MessageFlags.Ephemeral,
+      });
       return null;
     }
     return current + value;
   }
   if (operator === '-') {
     if (min != null && current - value < min) {
-      await interaction.reply({ content: `Cannot go below ${min} amount.`, flags: MessageFlags.Ephemeral });
+      await interaction.reply({
+        content: `Cannot go below ${min} amount.`,
+        flags: MessageFlags.Ephemeral,
+      });
       return null;
     }
     return current - value;
   }
   if (operator === '=') {
     if (max != null && value > max) {
-      await interaction.reply({ content: `Cannot exceed ${max} amount.`, flags: MessageFlags.Ephemeral });
+      await interaction.reply({
+        content: `Cannot exceed ${max} amount.`,
+        flags: MessageFlags.Ephemeral,
+      });
       return null;
     }
     if (min != null && value < min) {
-      await interaction.reply({ content: `Cannot go below ${min} amount.`, flags: MessageFlags.Ephemeral });
+      await interaction.reply({
+        content: `Cannot go below ${min} amount.`,
+        flags: MessageFlags.Ephemeral,
+      });
       return null;
     }
     return value;

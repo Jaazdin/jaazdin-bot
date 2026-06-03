@@ -57,7 +57,10 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
   const embeds: EmbedBuilder[] = await createBoatEmbed(runningBoats);
   if (embeds.length === 0) {
-    await interaction.reply({ content: 'No boats found.', flags: MessageFlags.Ephemeral });
+    await interaction.reply({
+      content: 'No boats found.',
+      flags: MessageFlags.Ephemeral,
+    });
     return;
   }
 
@@ -67,10 +70,16 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
     if (i === 0) {
       // First message uses reply
-      await interaction.reply({ embeds: embedChunk, flags: MessageFlags.Ephemeral });
+      await interaction.reply({
+        embeds: embedChunk,
+        flags: MessageFlags.Ephemeral,
+      });
     } else {
       // Subsequent messages use followUp
-      await interaction.followUp({ embeds: embedChunk, flags: MessageFlags.Ephemeral });
+      await interaction.followUp({
+        embeds: embedChunk,
+        flags: MessageFlags.Ephemeral,
+      });
     }
   }
 }

@@ -4,8 +4,14 @@
     "bonus": "An art dealer buys one of your pieces, roll Mason’s or Potter’s Tools check plus your job tier, you gain that much GP.",
     "roll": { "min": 21, "max": 40 }
   },
-  { "bonus": "ADV on your next Masons or Pottery tools check.", "roll": { "min": 41, "max": 55 } },
-  { "bonus": "Increase your Wage Progress by 1.", "roll": { "min": 56, "max": 70 } },
+  {
+    "bonus": "ADV on your next Masons or Pottery tools check.",
+    "roll": { "min": 41, "max": 55 }
+  },
+  {
+    "bonus": "Increase your Wage Progress by 1.",
+    "roll": { "min": 56, "max": 70 }
+  },
   {
     "bonus": "An art dealer buys one of your pieces, roll Mason’s or Potter’s Tools check plus your job tier, you gain twice that much GP.",
     "roll": { "min": 71, "max": 85 }
@@ -23,7 +29,10 @@
     "bonus": "An art dealer buys one of your pieces, roll Mason’s or Potter’s Tools check plus your job tier, you gain thrice that much GP.",
     "roll": { "min": 116, "max": 125 }
   },
-  { "bonus": "Increase your Wage Progress by 2.", "roll": { "min": 126, "max": 135 } },
+  {
+    "bonus": "Increase your Wage Progress by 2.",
+    "roll": { "min": 126, "max": 135 }
+  },
   {
     "bonus": "You ignore the tools and forging conditions of the next Alloy Check you attempt, as longs one of the tools doesn’t require smiths tools",
     "roll": { "min": 136, "max": 140 }
