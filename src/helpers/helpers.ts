@@ -188,18 +188,19 @@ export async function jobNameAutocomplete(interaction: AutocompleteInteraction):
   const focusedValue = interaction.options.getFocused().toLowerCase();
   const jobs = await Job.findAll();
 
-  const filtered = jobs.filter((job) =>
+  const sortedJobs = jobs.sort((a, b) =>
+    a.getDataValue('name').localeCompare(b.getDataValue('name'), undefined, { sensitivity: 'base' })
+  );
+
+  const filtered = sortedJobs.filter((job) =>
     (job as { dataValues: { name: string } }).dataValues.name.toLowerCase().startsWith(focusedValue)
   );
 
   await interaction.respond(
-    filtered
-      .slice(0, 25)
-      .map((job) => ({
-        name: formatNames((job as { dataValues: { name: string } }).dataValues.name),
-        value: (job as { dataValues: { name: string } }).dataValues.name,
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name))
+    filtered.slice(0, 25).map((job) => ({
+      name: formatNames((job as { dataValues: { name: string } }).dataValues.name),
+      value: (job as { dataValues: { name: string } }).dataValues.name,
+    }))
   );
 }
 

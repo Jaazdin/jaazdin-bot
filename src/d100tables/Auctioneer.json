@@ -1,0 +1,79 @@
+[
+  {
+    "bonus": "GP Die +1 & 10gp.",
+    "roll": {
+      "min": 1,
+      "max": 20
+    }
+  },
+  {
+    "bonus": "Attempt a DC 15 Persuasion check, on a success get offered a random uncommon metal, plant, potion, or poison for 20% off.",
+    "roll": {
+      "min": 21,
+      "max": 40
+    }
+  },
+  {
+    "bonus": "GP Die +2 & +20gp.",
+    "roll": {
+      "min": 41,
+      "max": 55
+    }
+  },
+  {
+    "bonus": "Increase your Wage progression by 1.",
+    "roll": {
+      "min": 56,
+      "max": 70
+    }
+  },
+  {
+    "bonus": "GP Die +3 & +30gp.",
+    "roll": {
+      "min": 71,
+      "max": 85
+    }
+  },
+  {
+    "bonus": "GP Die +4 & +40gp.",
+    "roll": {
+      "min": 86,
+      "max": 95
+    }
+  },
+  {
+    "bonus": "Make a Persuasion check, gain gold equal to twice the value + Job Tier.",
+    "roll": {
+      "min": 96,
+      "max": 105
+    }
+  },
+  {
+    "bonus": "GP Die +5 & +50gp.",
+    "roll": {
+      "min": 106,
+      "max": 115
+    }
+  },
+  {
+    "bonus": "Attempt a DC 20 Persuasion check, on a success get offered a random Rare metal, plant, potion, or poison for 20% off.",
+    "roll": {
+      "min": 116,
+      "max": 125
+    }
+  },
+  {
+    "bonus": "Increase your Wage progression by 2.",
+    "roll": {
+      "min": 126,
+      "max": 135
+    }
+  },
+  {
+    "bonus": "Attempt a DC 25 Persuasion check, on a success get offered a random Very Rare metal, plant, potion, or poison for 20% off.",
+    "roll": {
+      "min": 136,
+      "max": 300
+    }
+  }
+]
