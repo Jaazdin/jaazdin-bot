@@ -60,7 +60,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
         topTwoRerollHistory.push({ prevRolls: [prev0, prev1], prevSum: prev0 + prev1 });
         rolls[i0] = rollFormula('4d6dl1');
         rolls[i1] = rollFormula('4d6dl1');
-        console.log(rolls[i0].formattedResults, rolls[i1].formattedResults);
         grandTotal = rolls.reduce((sum, r) => sum + r.total, 0);
         topTwoRerolls++;
       } else {
