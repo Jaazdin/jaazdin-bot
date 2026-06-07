@@ -1,40 +1,79 @@
 [
-  { "bonus": "GP Die +1 +10", "roll": { "min": 1, "max": 20 } },
+  {
+    "bonus": "GP Die +1 +10",
+    "roll": {
+      "min": 1,
+      "max": 20
+    }
+  },
   {
     "bonus": "An art dealer buys one of your pieces, roll Mason’s or Potter’s Tools check plus your job tier, you gain that much GP.",
-    "roll": { "min": 21, "max": 40 }
+    "roll": {
+      "min": 21,
+      "max": 40
+    }
   },
   {
     "bonus": "ADV on your next Masons or Pottery tools check.",
-    "roll": { "min": 41, "max": 55 }
+    "roll": {
+      "min": 41,
+      "max": 55
+    }
   },
   {
     "bonus": "Increase your Wage Progress by 1.",
-    "roll": { "min": 56, "max": 70 }
+    "roll": {
+      "min": 56,
+      "max": 70
+    }
   },
   {
     "bonus": "An art dealer buys one of your pieces, roll Mason’s or Potter’s Tools check plus your job tier, you gain twice that much GP.",
-    "roll": { "min": 71, "max": 85 }
+    "roll": {
+      "min": 71,
+      "max": 85
+    }
   },
   {
     "bonus": "You ignore the Forging Condition on the next Smithing check you make as long as it doesn’t use smiths tools.",
-    "roll": { "min": 86, "max": 96 }
+    "roll": {
+      "min": 86,
+      "max": 96
+    }
   },
   {
     "bonus": "On your next quest, you can use two Hero Garden effects instead of one.",
-    "roll": { "min": 96, "max": 105 }
+    "roll": {
+      "min": 96,
+      "max": 105
+    }
   },
-  { "bonus": "GP Die +3 +30", "roll": { "min": 106, "max": 115 } },
+  {
+    "bonus": "GP Die +3 +30",
+    "roll": {
+      "min": 106,
+      "max": 115
+    }
+  },
   {
     "bonus": "An art dealer buys one of your pieces, roll Mason’s or Potter’s Tools check plus your job tier, you gain thrice that much GP.",
-    "roll": { "min": 116, "max": 125 }
+    "roll": {
+      "min": 116,
+      "max": 125
+    }
   },
   {
     "bonus": "Increase your Wage Progress by 2.",
-    "roll": { "min": 126, "max": 135 }
+    "roll": {
+      "min": 126,
+      "max": 135
+    }
   },
   {
     "bonus": "You ignore the tools and forging conditions of the next Alloy Check you attempt, as longs one of the tools doesn’t require smiths tools",
-    "roll": { "min": 136, "max": 140 }
+    "roll": {
+      "min": 136,
+      "max": 300
+    }
   }
 ]

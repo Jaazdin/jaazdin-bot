@@ -1,40 +1,79 @@
 [
-  { "bonus": "GP Die +1 +10", "roll": { "min": 1, "max": 20 } },
+  {
+    "bonus": "GP Die +1 +10",
+    "roll": {
+      "min": 1,
+      "max": 20
+    }
+  },
   {
     "bonus": "The next research check you make, you don’t have to roll a complication.",
-    "roll": { "min": 21, "max": 40 }
+    "roll": {
+      "min": 21,
+      "max": 40
+    }
   },
   {
     "bonus": "Gain a random common meal, potion, or poison (1d3).",
-    "roll": { "min": 41, "max": 55 }
+    "roll": {
+      "min": 41,
+      "max": 55
+    }
   },
   {
     "bonus": "Increase your Wage Progress by 1.",
-    "roll": { "min": 56, "max": 70 }
+    "roll": {
+      "min": 56,
+      "max": 70
+    }
   },
   {
     "bonus": "You can immediately make a research check without having to roll a complication.",
-    "roll": { "min": 71, "max": 85 }
+    "roll": {
+      "min": 71,
+      "max": 85
+    }
   },
   {
     "bonus": "Make use of any Specialty Facility that requires downtime to use, you get half the effect, a building must have a halfable effect.",
-    "roll": { "min": 86, "max": 96 }
+    "roll": {
+      "min": 86,
+      "max": 96
+    }
   },
   {
     "bonus": "Gain a random uncommon meal, potion, or poison (1d3)",
-    "roll": { "min": 96, "max": 105 }
+    "roll": {
+      "min": 96,
+      "max": 105
+    }
   },
-  { "bonus": "GP Die +3 +30", "roll": { "min": 106, "max": 115 } },
+  {
+    "bonus": "GP Die +3 +30",
+    "roll": {
+      "min": 106,
+      "max": 115
+    }
+  },
   {
     "bonus": "You can immediately make a research check without having to roll a complication. You gain a bonus to the roll equal to half your job tier.",
-    "roll": { "min": 116, "max": 125 }
+    "roll": {
+      "min": 116,
+      "max": 125
+    }
   },
   {
     "bonus": "Increase your Wage Progress by 2.",
-    "roll": { "min": 126, "max": 135 }
+    "roll": {
+      "min": 126,
+      "max": 135
+    }
   },
   {
     "bonus": "Make use of any Specialty Facility that requires downtime to use and get advantage on the roll if applicable.",
-    "roll": { "min": 136, "max": 140 }
+    "roll": {
+      "min": 136,
+      "max": 300
+    }
   }
 ]
