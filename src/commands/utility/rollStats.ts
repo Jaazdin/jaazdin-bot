@@ -9,8 +9,8 @@ const commandData: CommandData = {
   category: 'utility',
 };
 
-const MIN_TOTAL = 0;
-const MIN_TOP_TWO = 30;
+const MIN_TOTAL = 65;
+const MIN_TOP_TWO = 31;
 const MAX_ATTEMPTS = 100;
 
 type StatRolls = ReturnType<typeof rollFormula>[];
