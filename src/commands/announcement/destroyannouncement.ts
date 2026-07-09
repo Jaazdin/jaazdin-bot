@@ -32,6 +32,8 @@ async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
 
+  const truncatedMessage = announcement.message.length > 600 ? `${announcement.message.slice(0, 597)}...` : announcement.message;
+
   const confirm = await confirmAction({
     interaction,
     title: 'Destroy Announcement',
@@ -51,7 +53,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
       },
       {
         name: 'Message',
-        value: announcement.message,
+        value: truncatedMessage,
         inline: false,
       },
     ],
