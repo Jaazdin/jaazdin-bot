@@ -20,10 +20,10 @@ const commandData: CommandData = {
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
-  const name = interaction.options.getString('name') as string;
+  const id = parseInt(interaction.options.getString('name') as string, 10);
 
   // Find announcement
-  const announcement = await Announcement.findOne({ where: { name } });
+  const announcement = await Announcement.findOne({ where: { id } });
   if (!announcement) {
     await interaction.reply({
       content: 'Could not find the specified announcement.',
@@ -32,23 +32,13 @@ async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
 
-  const truncatedMessage = announcement.message.length > 600 ? `${announcement.message.slice(0, 597)}...` : announcement.message;
+  const truncatedMessage =
+    announcement.message.length > 600 ? `${announcement.message.slice(0, 597)}...` : announcement.message;
 
-  const confirm = await confirmAction({
-    interaction,
-    title: 'Destroy Announcement',
-    description: `Are you sure you want to destroy ${formatNames(announcement.name)}?`,
-    confirmButtonText: 'Destroy',
-    cancelButtonText: 'Cancel',
-    fields: [
+  const confirmFields = [
       {
         name: 'Announcement Name',
         value: formatNames(announcement.name),
-        inline: true,
-      },
-      {
-        name: 'Weeks Remaining',
-        value: `${announcement.weeks}`,
         inline: true,
       },
       {
@@ -56,7 +46,23 @@ async function execute(interaction: ChatInputCommandInteraction) {
         value: truncatedMessage,
         inline: false,
       },
-    ],
+    ]
+
+  if (announcement.weeks) {
+    confirmFields.splice(1, 0,{
+        name: 'Weeks Remaining',
+        value: `${announcement.weeks}`,
+        inline: true,
+      });
+  }
+
+  const confirm = await confirmAction({
+    interaction,
+    title: 'Destroy Announcement',
+    description: `Are you sure you want to destroy ${formatNames(announcement.name)}?`,
+    confirmButtonText: 'Destroy',
+    cancelButtonText: 'Cancel',
+    fields: confirmFields,
     confirmEmbed: [
       {
         title: '✅ Announcement Destroyed',
@@ -78,9 +84,10 @@ async function execute(interaction: ChatInputCommandInteraction) {
 async function autocomplete(interaction: AutocompleteInteraction) {
   const focusedValue = interaction.options.getFocused();
   const announcements = await Announcement.findAll();
-  const choices = announcements.map((a) => a.name);
-  const filtered = choices.filter((choice) => choice.toLowerCase().includes(focusedValue.toLowerCase()));
-  await interaction.respond(filtered.map((name) => ({ name, value: name })).slice(0, 25));
+  const filtered = announcements.filter((a) => a.name.toLowerCase().includes(focusedValue.toLowerCase()));
+  await interaction.respond(
+    filtered.slice(0, 25).map((a) => ({ name: `${a.name} (${a.message.slice(0, 25)}...)`, value: String(a.id) })),
+  );
 }
 
 export { execute, commandData, autocomplete };

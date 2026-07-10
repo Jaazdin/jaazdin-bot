@@ -24,7 +24,6 @@ const commandData: CommandData = {
       name: 'weeks',
       type: 'integer',
       description: 'Weeks remaining (min 1)',
-      required: true,
       minValue: 1,
     },
     {
@@ -37,12 +36,12 @@ const commandData: CommandData = {
 
 async function execute(interaction: ChatInputCommandInteraction) {
   // Get weeks and post_now from command
-  const weeks = interaction.options.getInteger('weeks', true);
+  const weeks = interaction.options.getInteger('weeks');
   const post_now = interaction.options.getBoolean('post_now') ?? false;
 
   // Show modal for input
   const modal = new ModalBuilder()
-    .setCustomId(`addannouncement-modal|${weeks}|${post_now}`)
+    .setCustomId(`addannouncement-modal|${weeks}|${post_now}`) // Pass weeks and post_now in customId
     .setTitle('Add Announcement');
 
   const nameInput = new TextInputBuilder()
@@ -75,7 +74,8 @@ async function handleModalSubmit(interaction: Interaction) {
   // Extract weeks and post_now from customId
   // Format: addannouncement-modal|<weeks>|<post_now>
   const customIdParts = interaction.customId.split('|');
-  const weeks = Number(customIdParts[1]);
+  const parsedWeeks = parseInt(customIdParts[1], 10);
+  const weeks = isNaN(parsedWeeks) ? undefined : parsedWeeks;
   const post_now = customIdParts[2] === 'true';
 
   const announcement = await Announcement.create({ name, message, weeks });
@@ -97,7 +97,7 @@ async function handleModalSubmit(interaction: Interaction) {
     try {
       const channel = await interaction.client.channels.fetch(CHANNEL_ID);
       if (channel instanceof TextChannel) {
-        announcement.weeks = announcement.weeks - 1;
+        announcement.weeks = announcement.weeks ? announcement.weeks - 1 : undefined;
         await announcement.save();
         const embed = showAnnouncement(announcement);
         await channel.send({ embeds: [embed] });

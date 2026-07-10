@@ -6,7 +6,7 @@ interface AnnouncementAttributes {
   id?: number;
   name: string;
   message: string;
-  weeks: number; // Weeks to repeat if repeatable
+  weeks?: number; // Weeks to repeat if repeatable
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -20,7 +20,7 @@ export class Announcement
   declare id?: number;
   declare name: string;
   declare message: string;
-  declare weeks: number;
+  declare weeks?: number;
   @CreatedAt declare createdAt?: Date;
   @UpdatedAt declare updatedAt?: Date;
 }
