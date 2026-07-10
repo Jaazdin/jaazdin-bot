@@ -188,8 +188,16 @@ async function execute(interaction: ChatInputCommandInteraction) {
         : `❌ Invalid (${finalValidation === 'total' ? `total < ${MIN_TOTAL}` : `top-2 < ${MIN_TOP_TWO}`})`;
 
     embed
-      .addFields({ name: '🎯 Grand Total', value: `**${grandTotal}**`, inline: true })
-      .addFields({ name: '🏆 Top 2 Total', value: `**${finalTopTwo}**`, inline: true })
+      .addFields({
+        name: '🎯 Grand Total',
+        value: `**${grandTotal}**`,
+        inline: true,
+      })
+      .addFields({
+        name: '🏆 Top 2 Total',
+        value: `**${finalTopTwo}**`,
+        inline: true,
+      })
       .addFields({ name: '📌 Result', value: statusText, inline: false })
       .setTimestamp();
 

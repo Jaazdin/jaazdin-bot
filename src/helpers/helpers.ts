@@ -189,7 +189,9 @@ export async function jobNameAutocomplete(interaction: AutocompleteInteraction):
   const jobs = await Job.findAll();
 
   const sortedJobs = jobs.sort((a, b) =>
-    a.getDataValue('name').localeCompare(b.getDataValue('name'), undefined, { sensitivity: 'base' })
+    a.getDataValue('name').localeCompare(b.getDataValue('name'), undefined, {
+      sensitivity: 'base',
+    })
   );
 
   const filtered = sortedJobs.filter((job) =>

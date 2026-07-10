@@ -9,7 +9,7 @@
     "start": "bun run src/index.ts",
     "start:prd": "bun run pretty && NODE_ENV=production bun run src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun ",
-    "deploy": "bun run pretty && bun run src/helpers/deploy-commands.ts",
+    "deploy": "bun run src/helpers/deploy-commands.ts",
     "pretty": "prettier --write .",
     "lint": "tsc --noEmit && eslint ."
   },
