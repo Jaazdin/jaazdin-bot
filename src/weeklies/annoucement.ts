@@ -10,7 +10,7 @@ async function update() {
   const announcements = await Announcement.findAll();
 
   for (const announcement of announcements) {
-    if (announcement.weeks === undefined) {
+    if (announcement.weeks === undefined || announcement.weeks === null) {
       continue;
     }
     if (announcement.weeks <= 0) {
