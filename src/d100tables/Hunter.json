@@ -1,0 +1,79 @@
+[
+  {
+    "bonus": "GP Die +1 & +10gp.",
+    "roll": {
+      "min": 1,
+      "max": 20
+    }
+  },
+  {
+    "bonus": "Make a Survival check to either gain a common plant, meat, or research a Bounty. Roll 1d12 to gain meat type. DC 11. 1d8 Meat",
+    "roll": {
+      "min": 21,
+      "max": 40
+    }
+  },
+  {
+    "bonus": "Gain advantage on your next Survival check in downtime.",
+    "roll": {
+      "min": 41,
+      "max": 55
+    }
+  },
+  {
+    "bonus": "Increase Wage Progress by 1.",
+    "roll": {
+      "min": 56,
+      "max": 70
+    }
+  },
+  {
+    "bonus": "Progress a Bounty's research by half your Job Tier (rounded down).",
+    "roll": {
+      "min": 71,
+      "max": 85
+    }
+  },
+  {
+    "bonus": "Make a Survival check to either gain a uncommon plant, meat, or research a Bounty. Roll 1d12 to gain meat type. DC 15. 1d6 Meat",
+    "roll": {
+      "min": 86,
+      "max": 95
+    }
+  },
+  {
+    "bonus": "Gain a 5% discount off your next bounty. (After research reductions, Max 90%)",
+    "roll": {
+      "min": 96,
+      "max": 105
+    }
+  },
+  {
+    "bonus": "GP Die +3 & +30gp.",
+    "roll": {
+      "min": 106,
+      "max": 115
+    }
+  },
+  {
+    "bonus": "Make a Survival check to either gain a rare plant, meat, or research a Bounty. Roll 1d12 to gain meat type. DC 19. 1d4 Meat",
+    "roll": {
+      "min": 116,
+      "max": 125
+    }
+  },
+  {
+    "bonus": "Increase your Wage Progress by 2.",
+    "roll": {
+      "min": 126,
+      "max": 135
+    }
+  },
+  {
+    "bonus": "Progress a Bounty's research by your Job Tier.",
+    "roll": {
+      "min": 136,
+      "max": 300
+    }
+  }
+]
