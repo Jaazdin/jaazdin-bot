@@ -1,6 +1,7 @@
 import { Client, Events, Interaction } from 'discord.js';
 // Import your modal handlers
-import { handleAnnouncementModal } from '~/commands/announcement/addannouncement';
+import { handleAddAnnouncementModal } from '~/commands/announcement/addannouncement';
+import { handleEditAnnouncementModal } from '~/commands/announcement/editannouncement';
 
 export function setupModalInteractionHandler(client: Client) {
   client.on(Events.InteractionCreate, async (interaction: Interaction) => {
@@ -9,7 +10,10 @@ export function setupModalInteractionHandler(client: Client) {
     try {
       // Route to appropriate handler based on customId
       if (interaction.customId.startsWith('addannouncement-modal|')) {
-        await handleAnnouncementModal(interaction);
+        await handleAddAnnouncementModal(interaction);
+      }
+      if (interaction.customId.startsWith('editannouncement-modal|')) {
+        await handleEditAnnouncementModal(interaction);
       }
       // Add other modal handlers here
     } catch (error) {

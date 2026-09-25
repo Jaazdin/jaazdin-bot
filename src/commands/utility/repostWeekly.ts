@@ -10,30 +10,27 @@ const commandData: CommandData = {
 };
 
 async function execute(interaction: ChatInputCommandInteraction) {
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   try {
     const result = await executeWeeklyTasks(true);
     if (result === 2) {
-      await interaction.reply({
+      await interaction.editReply({
         content: `Weekly tasks are currently paused. Cannot repost until unpaused.`,
-        flags: MessageFlags.Ephemeral,
       });
       return;
     } else if (result === 1) {
-      await interaction.reply({
+      await interaction.editReply({
         content: `Failed to repost weekly tasks. No tasks found.`,
-        flags: MessageFlags.Ephemeral,
       });
       return;
     }
-    await interaction.reply({
+    await interaction.editReply({
       content: `Weekly tasks have been reposted.`,
-      flags: MessageFlags.Ephemeral,
     });
   } catch (error) {
     console.error('Error reposting weekly tasks:', error);
-    await interaction.reply({
+    await interaction.editReply({
       content: `An error occurred while reposting weekly tasks.`,
-      flags: MessageFlags.Ephemeral,
     });
     return;
   }
