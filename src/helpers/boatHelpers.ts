@@ -256,13 +256,13 @@ export async function generateShipmentItems(boat: Boat): Promise<ShipmentItem[]>
         .fill(0)
         .map(() => typeFromInclusiveRanges(randomInt(1, 20), PET_RARITY_RANGES, 'Common'));
       for (const rarity of rarities) {
-        let pet = null,
-          type: string;
-        do {
-          type = typeFromInclusiveRanges(randomInt(1, 20), PET_TYPE_RANGES, 'Beast');
+        let pet = null;
+        // Reroll the type until a pet exists, but give up so a missing rarity can't hang forever
+        for (let attempt = 0; attempt < 20 && !pet; attempt++) {
+          const type = typeFromInclusiveRanges(randomInt(1, 20), PET_TYPE_RANGES, 'Beast');
           pet = await getRandomPetByRarityAndType(rarity, type);
-        } while (!pet);
-        addOrIncrementItem(result, pet.name, randomInt(pet.price_min, pet.price_max), 'pet');
+        }
+        if (pet) addOrIncrementItem(result, pet.name, randomInt(pet.price_min, pet.price_max), 'pet');
       }
       return result;
     }

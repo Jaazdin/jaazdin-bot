@@ -1,5 +1,6 @@
 import { ChatInputCommandInteraction, AutocompleteInteraction, MessageFlags } from 'discord.js';
 import { TIMER_MAX_LENGTH } from '~/constants';
+import { db } from '~/db/db';
 import { Boat, Shipment } from '~/db/models/Boat';
 import {
   findBoatByName,
@@ -8,6 +9,7 @@ import {
   boatAtSeaEmbedBuilder,
   tableToGenerateChoices,
   parseChangeString,
+  updateBoatEmbed,
 } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
@@ -54,14 +56,11 @@ const commandData: CommandData = {
   ],
 };
 
-function buildBoatUpdatesFromOptions(
-  interaction: ChatInputCommandInteraction,
-  existingBoat?: Boat
-): { updates: Record<string, unknown>; error?: string } {
-  const updates: Record<string, unknown> = {};
+function buildBoatUpdatesFromOptions(interaction: ChatInputCommandInteraction, boat: Boat): Partial<Boat> {
+  const updates: Partial<Boat> = {};
 
   // Helper function to add non-null values to updates
-  const addIfNotNull = (key: string, value: unknown) => {
+  const addIfNotNull = <K extends keyof Boat>(key: K, value: Boat[K] | null) => {
     if (value !== null) updates[key] = value;
   };
 
@@ -74,113 +73,41 @@ function buildBoatUpdatesFromOptions(
   // Integer fields
   addIfNotNull('waitTime', interaction.options.getInteger('waittime'));
   addIfNotNull('timeInTown', interaction.options.getInteger('timeintown'));
-  // Handle weeksLeft as a string change system
-  const weeksLeftRaw = interaction.options.getString('weeksleft');
-  if (weeksLeftRaw !== null && existingBoat) {
-    // Use parseChangeString to compute new weeksLeft
-    // This is synchronous in buildBoatUpdatesFromOptions, so we use a sync fallback
-    // (parseChangeString is async, but we can't await here; handle in execute if needed)
-    updates.weeksLeft = undefined; // Mark for later update in execute
-  } else {
-    addIfNotNull('weeksLeft', interaction.options.getInteger('weeksleft'));
-  }
 
   // Boolean fields
   addIfNotNull('isTier2', interaction.options.getBoolean('istier2'));
   addIfNotNull('isRunning', interaction.options.getBoolean('isrunning'));
   addIfNotNull('isInTown', interaction.options.getBoolean('isintown'));
 
-  // Auto-calculate weeksLeft if not explicitly set,
-  // and only if relevant fields that affect weeksLeft were changed
-  if (
-    updates.weeksLeft === undefined &&
-    (updates.waitTime !== undefined ||
-      updates.timeInTown !== undefined ||
-      updates.isTier2 !== undefined ||
-      updates.isInTown !== undefined)
-  ) {
-    // Calculate weeksLeft based on boat state and timing values
-    const waitTime = interaction.options.getInteger('waittime') ?? existingBoat?.waitTime;
-    const timeInTown = interaction.options.getInteger('timeintown') ?? existingBoat?.timeInTown;
-    const isTier2 = interaction.options.getBoolean('istier2') ?? existingBoat?.isTier2 ?? false;
-    const isInTown = interaction.options.getBoolean('isintown') ?? existingBoat?.isInTown ?? false;
-
-    const timeToUse = isInTown ? timeInTown : waitTime;
-
-    if (timeToUse !== null && timeToUse !== undefined) {
-      if (isInTown) {
-        // Boat in town: use timeInTown (+ 1 for tier 2)
-        updates.weeksLeft = isTier2 ? timeToUse + 1 : timeToUse;
-      } else {
-        // Boat at sea: use waitTime (- 1 for tier 2)
-        updates.weeksLeft = isTier2 ? timeToUse - 1 : timeToUse;
-      }
-    }
+  // Moving between town and sea restarts the countdown for the new location,
+  // matching the weekly rollover (tier 2 boats spend one less week at sea and one more in town)
+  if (updates.isInTown !== undefined && updates.isInTown !== boat.isInTown) {
+    const isTier2 = updates.isTier2 ?? boat.isTier2 ?? false;
+    updates.weeksLeft = updates.isInTown
+      ? (updates.timeInTown ?? boat.timeInTown) + (isTier2 ? 1 : 0)
+      : (updates.waitTime ?? boat.waitTime) - (isTier2 ? 1 : 0);
   }
 
-  return { updates };
-}
-
-async function handleShipmentUpdate(boat: Boat, updates: Partial<Boat>): Promise<void> {
-  // If tableToGenerate was changed in the updates, use the new value
-  const newTableToGenerate = updates.tableToGenerate !== undefined ? updates.tableToGenerate : boat.tableToGenerate;
-  const newIsInTown = updates.isInTown !== undefined ? updates.isInTown : boat.isInTown;
-
-  const shouldHaveShipmentAfterUpdate = newIsInTown && newTableToGenerate && newTableToGenerate !== 'NA';
-
-  if (shouldHaveShipmentAfterUpdate) {
-    // Remove old shipments for this boat
-    await Shipment.destroy({ where: { boatId: boat.id } });
-
-    // Generate new shipment if the boat should have one
-    const goods = await generateShipmentItems({
-      ...boat.dataValues,
-      ...updates,
-      tableToGenerate: newTableToGenerate,
-      isInTown: newIsInTown,
-    } as Boat);
-
-    // Insert new shipment items
-    for (const item of goods) {
-      await Shipment.create({
-        boatId: boat.id,
-        itemName: item.itemName,
-        price: item.price,
-        quantity: item.quantity,
-        type: item.type,
-      });
-    }
-  } else {
-    // Remove shipments if boat should not have them
-    await Shipment.destroy({ where: { boatId: boat.id } });
-  }
+  return updates;
 }
 
 async function execute(interaction: ChatInputCommandInteraction) {
   const boatName = interaction.options.getString('name', true);
 
-  // Use helper to find boat with error handling
+  // Validate everything that can reply with an error before deferring
   const boat = await findBoatByName(interaction, boatName);
   if (!boat) {
     return;
   }
 
-  // Build update object using helper
-  const { updates, error } = buildBoatUpdatesFromOptions(interaction, boat);
-  if (error) {
-    await interaction.reply({
-      content: error,
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
+  const updates = buildBoatUpdatesFromOptions(interaction, boat);
 
-  // If weeksLeft is to be updated using the string system, do it here
+  // An explicit weeksleft (+x, -x, =x) overrides any recalculated value
   const weeksLeftRaw = interaction.options.getString('weeksleft');
   if (weeksLeftRaw !== null) {
     const newWeeksLeft = await parseChangeString(
       weeksLeftRaw,
-      boat.weeksLeft,
+      updates.weeksLeft ?? boat.weeksLeft,
       'weeks left',
       0,
       TIMER_MAX_LENGTH,
@@ -190,21 +117,48 @@ async function execute(interaction: ChatInputCommandInteraction) {
     updates.weeksLeft = newWeeksLeft;
   }
 
-  try {
-    // Update the boat
-    await boat.update(updates);
+  // Shipment generation can take longer than Discord's 3 second reply window
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-    // Handle shipment generation/removal based on the updates
-    await handleShipmentUpdate(boat, updates);
+  try {
+    const newTableToGenerate = updates.tableToGenerate ?? boat.tableToGenerate;
+    const newIsInTown = updates.isInTown ?? boat.isInTown;
+    const shouldHaveShipment = newIsInTown && !!newTableToGenerate && newTableToGenerate !== 'NA';
+
+    // Only reroll the shipment when the table changes or the boat arrives in town,
+    // so unrelated edits don't wipe the current stock
+    const needsNewShipment =
+      shouldHaveShipment && (newTableToGenerate !== boat.tableToGenerate || (newIsInTown && !boat.isInTown));
+
+    const goods = needsNewShipment ? await generateShipmentItems({ ...boat.dataValues, ...updates } as Boat) : null;
+
+    await db.transaction(async (transaction) => {
+      await boat.update(updates, { transaction });
+
+      if (!shouldHaveShipment || goods) {
+        await Shipment.destroy({ where: { boatId: boat.id }, transaction });
+      }
+      if (goods) {
+        await Shipment.bulkCreate(
+          goods.map((item) => ({
+            boatId: boat.id,
+            itemName: item.itemName,
+            price: item.price,
+            quantity: item.quantity,
+            type: item.type,
+          })),
+          { transaction }
+        );
+      }
+    });
+
+    await updateBoatEmbed(boat.boatName);
 
     const embed = await boatAtSeaEmbedBuilder(boat);
-
-    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+    await interaction.editReply({ embeds: [embed] });
   } catch (error) {
-    await interaction.reply({
-      content: `Failed to update boat: ${error}`,
-      flags: MessageFlags.Ephemeral,
-    });
+    console.error(error);
+    await interaction.editReply({ content: `Failed to update boat: ${error}` });
   }
 }
 

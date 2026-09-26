@@ -49,7 +49,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       console.error(error);
       const errorMessage = {
         content: 'There was an error while executing this command!',
-        MessageFlags: MessageFlags.Ephemeral,
+        flags: MessageFlags.Ephemeral,
       };
       await interaction.respond([{ name: errorMessage.content, value: 'error' }]);
     }
@@ -74,7 +74,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     console.error(error);
     const errorMessage = {
       content: 'There was an error while executing this command!',
-      MessageFlags: MessageFlags.Ephemeral,
+      flags: MessageFlags.Ephemeral as const,
     };
 
     if (interaction.replied || interaction.deferred) {
