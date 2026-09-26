@@ -1,4 +1,11 @@
-import { AutocompleteInteraction, ChatInputCommandInteraction, EmbedBuilder, MessageFlags } from 'discord.js';
+import {
+  AutocompleteInteraction,
+  ChatInputCommandInteraction,
+  DiscordAPIError,
+  EmbedBuilder,
+  MessageFlags,
+  RESTJSONErrorCodes,
+} from 'discord.js';
 import { Boat, Shipment } from '~/db/models/Boat';
 import { formatNames, randomInt } from './helpers';
 
@@ -619,7 +626,17 @@ export async function formatShipmentInfo(boatId: number): Promise<string> {
 }
 
 /**
- * Update a boat's Discord embed with current information
+ * Build the embeds shown for a boat in its weekly post message
+ */
+export async function buildBoatPostEmbeds(boat: Boat): Promise<EmbedBuilder[]> {
+  if (!boat.isInTown) return [await boatAtSeaEmbedBuilder(boat)];
+  const embeds = await boatInTownEmbedBuilder(boat);
+  // Discord allows at most 10 embeds per message
+  return (Array.isArray(embeds) ? embeds : [embeds]).slice(0, 10);
+}
+
+/**
+ * Edit a boat's weekly post message so it reflects the boat's current state and shipment
  */
 export async function updateBoatEmbed(boatName: string): Promise<boolean> {
   const { client } = await import('~/index');
@@ -647,40 +664,14 @@ export async function updateBoatEmbed(boatName: string): Promise<boolean> {
       return false;
     }
 
-    // Fetch the message
     const message = await channel.messages.fetch(boat.messageId);
-    if (!message) {
-      console.warn(`Message ${boat.messageId} not found for boat ${boatName}`);
-      // Clear the messageId since the message no longer exists
-      boat.messageId = null;
-      await boat.save();
-      return false;
-    }
-
-    // Create updated embed
-    const { EmbedBuilder } = await import('discord.js');
-    const boatInfo = formatBoatInfo(boat);
-    const shipmentInfo = await formatShipmentInfo(boat.id);
-    const tableDescription = boatTableDescriptions[boat.tableToGenerate] || 'Unknown';
-
-    let desc = boatInfo;
-    if (tableDescription) {
-      desc += `\n**Table:** ${tableDescription}`;
-    }
-    if (shipmentInfo) {
-      desc += `\n\n${shipmentInfo}`;
-    }
-
-    const updatedEmbed = new EmbedBuilder().setTitle(boat.boatName).setDescription(desc).setColor(0x2e86c1);
-
-    // Update the message
-    await message.edit({ embeds: [updatedEmbed] });
+    await message.edit({ embeds: await buildBoatPostEmbeds(boat) });
     console.log(`Updated embed for boat: ${boatName}`);
     return true;
   } catch (error) {
     console.error(`Failed to update boat embed for ${boatName}:`, error);
-    // If the message is not found or can't be edited, clear the messageId
-    if (error instanceof Error && error.message.includes('Unknown Message')) {
+    // The message was deleted, so stop trying to edit it
+    if (error instanceof DiscordAPIError && error.code === RESTJSONErrorCodes.UnknownMessage) {
       boat.messageId = null;
       await boat.save();
     }
