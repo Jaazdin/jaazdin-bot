@@ -62,13 +62,13 @@ async function execute(interaction: ChatInputCommandInteraction) {
   if (quantity !== null && quantity <= 0) {
     await shipment.destroy();
 
-    // Update the boat's Discord embed if it exists
-    await updateBoatEmbed(boatName);
-
     await interaction.reply({
       content: `Shipment for **${itemName}** on boat **${boatName}** has been deleted (quantity set to ${quantity}).`,
       flags: MessageFlags.Ephemeral,
     });
+
+    // Update the boat's weekly post after replying, since editing Discord messages can be slow
+    await updateBoatEmbed(boatName);
     return;
   }
 
@@ -87,13 +87,13 @@ async function execute(interaction: ChatInputCommandInteraction) {
   try {
     await shipment.save();
 
-    // Update the boat's Discord embed if it exists
-    await updateBoatEmbed(boatName);
-
     await interaction.reply({
       content: `Shipment for **${itemName}** on boat **${boatName}** updated successfully.`,
       flags: MessageFlags.Ephemeral,
     });
+
+    // Update the boat's weekly post after replying, since editing Discord messages can be slow
+    await updateBoatEmbed(boatName);
   } catch (error) {
     await interaction.reply({
       content: `Failed to update shipment: ${error}`,

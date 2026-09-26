@@ -1,10 +1,7 @@
 import { Op } from 'sequelize';
 import { Boat, Shipment } from '~/db/models/Boat';
-import { TextChannel } from 'discord.js';
-import { client } from '~/index';
 // Import helper functions from boatHelpers
-import { buildBoatPostEmbeds, generateShipmentItems } from '~/helpers';
-import { createBoatEmbed } from '~/commands/boat/showboats';
+import { buildBoatPostEmbeds, generateShipmentItems, getBoatChannel } from '~/helpers';
 
 async function update() {
   // 1. Advance all running boats by 1 week
@@ -68,46 +65,32 @@ async function update() {
 }
 
 async function post() {
-  const CHANNEL_ID = process.env.BOT_CHANNEL_ID;
-  if (!CHANNEL_ID) {
-    console.error('BOT_CHANNEL_ID is not defined');
-    return;
-  }
-  if (!client.isReady()) {
-    console.warn('Discord client not ready.');
-    return;
-  }
-
-  const runningBoats = await Boat.findAll({
-    where: { isRunning: true },
-    order: [['weeksLeft', 'ASC']],
-  });
-  if (runningBoats.length === 0) {
-    return;
-  }
+  const channel = await getBoatChannel();
+  if (!channel) return;
 
   try {
-    const channel = await client.channels.fetch(CHANNEL_ID);
-    if (channel instanceof TextChannel) {
-      // Forget last week's messages so edits only ever target this week's post
-      await Boat.update({ messageId: null }, { where: { messageId: { [Op.ne]: null } } });
+    // Forget last week's messages so edits only ever target this week's post
+    await Boat.update({ messageId: null }, { where: { messageId: { [Op.ne]: null } } });
 
-      // Each boat in town gets its own message so updateBoatEmbed can edit it later
-      for (const boat of runningBoats.filter((b) => b.isInTown)) {
-        const message = await channel.send({ embeds: await buildBoatPostEmbeds(boat) });
-        boat.messageId = message.id;
-        await boat.save();
-      }
+    const runningBoats = await Boat.findAll({
+      where: { isRunning: true },
+      order: [['weeksLeft', 'ASC']],
+    });
 
-      // Boats at sea share one summary message
-      const atSeaEmbeds = await createBoatEmbed(runningBoats.filter((b) => !b.isInTown));
-      if (atSeaEmbeds.length > 0) {
-        await channel.send({ embeds: atSeaEmbeds });
-      }
-      console.log('Boat update sent to Discord.');
-    } else {
-      console.warn('Target channel is not a text channel.');
+    // Each boat in town gets its own message so updateBoatEmbed can edit it later
+    for (const boat of runningBoats.filter((b) => b.isInTown)) {
+      const message = await channel.send({ embeds: await buildBoatPostEmbeds([boat]) });
+      boat.messageId = message.id;
+      await boat.save();
     }
+
+    // Boats at sea share one summary message, so they all store its ID
+    const boatsAtSea = runningBoats.filter((b) => !b.isInTown);
+    if (boatsAtSea.length > 0) {
+      const message = await channel.send({ embeds: await buildBoatPostEmbeds(boatsAtSea) });
+      await Boat.update({ messageId: message.id }, { where: { id: boatsAtSea.map((b) => b.id) } });
+    }
+    console.log('Boat update sent to Discord.');
   } catch (error) {
     console.error('Failed to send boat update:', error);
   }

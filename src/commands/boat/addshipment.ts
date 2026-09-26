@@ -50,9 +50,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
       type: itemType,
     });
 
-    // Update the boat's Discord embed if it exists
-    await updateBoatEmbed(boatName);
-
     const embed = new EmbedBuilder()
       .setTitle(`✅ Shipment Added to ${formatNames(boatName)}`)
       .setDescription(`Added **${formatNames(itemName)}** (x${quantity}, ${price}gp each)`)
@@ -62,6 +59,9 @@ async function execute(interaction: ChatInputCommandInteraction) {
       embeds: [embed],
       flags: MessageFlags.Ephemeral,
     });
+
+    // Update the boat's weekly post after replying, since editing Discord messages can be slow
+    await updateBoatEmbed(boatName);
   } catch (error) {
     await interaction.reply({
       content: `Failed to add shipment: ${error}`,

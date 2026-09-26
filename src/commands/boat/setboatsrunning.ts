@@ -1,5 +1,6 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { Boat } from '~/db/models/Boat';
+import { updateBoatEmbed } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 import { Op } from 'sequelize';
 
@@ -36,18 +37,23 @@ async function execute(interaction: ChatInputCommandInteraction) {
       .map((name) => name.trim())
       .filter((name) => name.length > 0);
   }
+  const where = exceptions.length > 0 ? { boatName: { [Op.notIn]: exceptions } } : {};
+
+  // Remember which boats actually change so only their posts need updating
+  const changedBoats = await Boat.findAll({ where: { ...where, isRunning: { [Op.ne]: running } } });
+
   // Update all boats except those in exceptions
-  const [affected] = await Boat.update(
-    { isRunning: running },
-    {
-      where: exceptions.length > 0 ? { boatName: { [Op.notIn]: exceptions } } : {},
-    }
-  );
+  const [affected] = await Boat.update({ isRunning: running }, { where });
 
   await interaction.reply({
     content: `Set ${affected} boat(s) to ${running ? 'running' : 'not running'}${exceptions.length ? ` (except: ${exceptions.join(', ')})` : ''}.`,
     flags: MessageFlags.Ephemeral,
   });
+
+  // One at a time, so boats heading to sea join a single summary instead of each posting one
+  for (const boat of changedBoats) {
+    await updateBoatEmbed(boat.boatName);
+  }
 }
 
 export { execute, commandData };

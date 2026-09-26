@@ -5,7 +5,9 @@ import {
   EmbedBuilder,
   MessageFlags,
   RESTJSONErrorCodes,
+  SendableChannels,
 } from 'discord.js';
+import { Op } from 'sequelize';
 import { Boat, Shipment } from '~/db/models/Boat';
 import { formatNames, randomInt } from './helpers';
 
@@ -626,55 +628,139 @@ export async function formatShipmentInfo(boatId: number): Promise<string> {
 }
 
 /**
- * Build the embeds shown for a boat in its weekly post message
+ * Build the weekly post embeds for a list of boats: each boat in town gets its own embed(s),
+ * and all boats at sea share one summary embed
  */
-export async function buildBoatPostEmbeds(boat: Boat): Promise<EmbedBuilder[]> {
-  if (!boat.isInTown) return [await boatAtSeaEmbedBuilder(boat)];
-  const embeds = await boatInTownEmbedBuilder(boat);
-  // Discord allows at most 10 embeds per message
-  return (Array.isArray(embeds) ? embeds : [embeds]).slice(0, 10);
+export async function createBoatEmbed(boats: Boat[]) {
+  const embeds: EmbedBuilder[] = [];
+
+  const boatsInTown = boats.filter((b) => b.isInTown);
+  const boatsNotInTown = boats.filter((b) => !b.isInTown);
+
+  // Embeds for boats in town
+  for (const boat of boatsInTown) {
+    const boatEmbeds = await boatInTownEmbedBuilder(boat);
+    if (Array.isArray(boatEmbeds)) {
+      embeds.push(...boatEmbeds);
+    } else {
+      embeds.push(boatEmbeds);
+    }
+  }
+
+  // Embed for boats not in town
+  if (boatsNotInTown.length > 0) {
+    const notInTownDesc = boatsNotInTown.map((b) => `🌊 **${b.boatName}** — ⏳ ${b.weeksLeft} week(s) left`).join('\n');
+    embeds.push(
+      new EmbedBuilder().setTitle('🚢 Boats Not In Town (At Sea)').setDescription(notInTownDesc).setColor(0x888888)
+    );
+  }
+
+  return embeds;
 }
 
 /**
- * Edit a boat's weekly post message so it reflects the boat's current state and shipment
+ * Build the embeds for one weekly post message
  */
-export async function updateBoatEmbed(boatName: string): Promise<boolean> {
+export async function buildBoatPostEmbeds(boats: Boat[]): Promise<EmbedBuilder[]> {
+  // Discord allows at most 10 embeds per message
+  return (await createBoatEmbed(boats)).slice(0, 10);
+}
+
+/**
+ * Get the channel the weekly boat post lives in, or null if it isn't available
+ */
+export async function getBoatChannel(): Promise<SendableChannels | null> {
   const { client } = await import('~/index');
 
   if (!client.isReady()) {
-    console.warn('Discord client not ready for embed update');
-    return false;
-  }
-
-  const boat = await Boat.findOne({ where: { boatName } });
-  if (!boat || !boat.messageId) {
-    return false;
+    console.warn('Discord client not ready for boat post update');
+    return null;
   }
 
   const CHANNEL_ID = process.env.BOT_CHANNEL_ID;
   if (!CHANNEL_ID) {
     console.error('BOT_CHANNEL_ID is not defined');
-    return false;
+    return null;
   }
 
-  try {
-    const channel = await client.channels.fetch(CHANNEL_ID);
-    if (!channel || !channel.isTextBased()) {
-      console.warn('Target channel is not a text channel');
-      return false;
-    }
+  const channel = await client.channels.fetch(CHANNEL_ID);
+  if (!channel || !channel.isSendable()) {
+    console.warn('Target channel is not a text channel');
+    return null;
+  }
+  return channel;
+}
 
-    const message = await channel.messages.fetch(boat.messageId);
-    await message.edit({ embeds: await buildBoatPostEmbeds(boat) });
-    console.log(`Updated embed for boat: ${boatName}`);
-    return true;
+/**
+ * Redraw a weekly post message from the boats that currently point at it,
+ * deleting the message once no boats are left in it
+ */
+export async function refreshBoatMessage(messageId: string): Promise<void> {
+  try {
+    const channel = await getBoatChannel();
+    if (!channel) return;
+
+    const boats = await Boat.findAll({ where: { messageId }, order: [['weeksLeft', 'ASC']] });
+    const message = await channel.messages.fetch(messageId);
+    if (boats.length === 0) {
+      await message.delete();
+    } else {
+      await message.edit({ embeds: await buildBoatPostEmbeds(boats) });
+    }
   } catch (error) {
-    console.error(`Failed to update boat embed for ${boatName}:`, error);
+    console.error(`Failed to refresh boat message ${messageId}:`, error);
     // The message was deleted, so stop trying to edit it
     if (error instanceof DiscordAPIError && error.code === RESTJSONErrorCodes.UnknownMessage) {
-      boat.messageId = null;
-      await boat.save();
+      await Boat.update({ messageId: null }, { where: { messageId } });
     }
+  }
+}
+
+/**
+ * Keep the weekly post accurate after a boat changes. Boats in town have their own message,
+ * running boats at sea share the summary message, and boats that aren't running are left out.
+ */
+export async function updateBoatEmbed(boatName: string): Promise<boolean> {
+  try {
+    const channel = await getBoatChannel();
+    if (!channel) return false;
+
+    const boat = await Boat.findOne({ where: { boatName } });
+    if (!boat) return false;
+
+    const oldMessageId = boat.messageId;
+    // A message shared with other boats is the at-sea summary; one only this boat uses can be reused
+    const ownsOldMessage =
+      oldMessageId !== null &&
+      (await Boat.count({ where: { messageId: oldMessageId, id: { [Op.ne]: boat.id } } })) === 0;
+    const reusableMessageId = ownsOldMessage ? oldMessageId : null;
+
+    let newMessageId: string | null = null;
+    if (boat.isRunning && boat.isInTown) {
+      newMessageId = reusableMessageId;
+    } else if (boat.isRunning) {
+      const boatInSummary = await Boat.findOne({
+        where: { isRunning: true, isInTown: false, id: { [Op.ne]: boat.id }, messageId: { [Op.ne]: null } },
+      });
+      newMessageId = boatInSummary?.messageId ?? reusableMessageId;
+    }
+
+    // Nothing to reuse or join, so post a new message (a boat of its own, or a new at-sea summary)
+    let posted = false;
+    if (boat.isRunning && !newMessageId) {
+      const message = await channel.send({ embeds: await buildBoatPostEmbeds([boat]) });
+      newMessageId = message.id;
+      posted = true;
+    }
+
+    boat.messageId = newMessageId;
+    await boat.save();
+
+    if (newMessageId && !posted) await refreshBoatMessage(newMessageId);
+    if (oldMessageId && oldMessageId !== newMessageId) await refreshBoatMessage(oldMessageId);
+    return true;
+  } catch (error) {
+    console.error(`Failed to update boat post for ${boatName}:`, error);
     return false;
   }
 }

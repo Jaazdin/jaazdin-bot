@@ -26,6 +26,17 @@ const commandData: CommandData = {
       required: true,
       autocomplete: true,
     },
+    {
+      name: 'weeksleft',
+      type: 'string',
+      description: 'Weeks left, minimum 1 (use +x, -x, =x)',
+    },
+    {
+      name: 'isrunning',
+      type: 'boolean',
+      description: 'Is this boat running?',
+    },
+    { name: 'isintown', type: 'boolean', description: 'Is the boat in town?' },
     { name: 'city', type: 'string', description: 'City of origin' },
     { name: 'country', type: 'string', description: 'Country of origin' },
     { name: 'waittime', type: 'integer', description: 'Weeks at sea' },
@@ -42,17 +53,6 @@ const commandData: CommandData = {
       choices: tableToGenerateChoices,
     },
     { name: 'istier2', type: 'boolean', description: 'Is this a tier 2 boat?' },
-    {
-      name: 'isrunning',
-      type: 'boolean',
-      description: 'Is this boat running?',
-    },
-    {
-      name: 'weeksleft',
-      type: 'string',
-      description: 'Weeks left (use +x, -x, =x)',
-    },
-    { name: 'isintown', type: 'boolean', description: 'Is the boat in town?' },
   ],
 };
 
@@ -109,11 +109,19 @@ async function execute(interaction: ChatInputCommandInteraction) {
       weeksLeftRaw,
       updates.weeksLeft ?? boat.weeksLeft,
       'weeks left',
-      0,
+      null,
       TIMER_MAX_LENGTH,
       interaction
     );
     if (newWeeksLeft === null) return;
+    // Reaching 0 weeks means the boat changes location, which isintown handles (countdown and shipment)
+    if (newWeeksLeft < 1) {
+      await interaction.reply({
+        content: `Weeks left can't go below 1 (this would set it to ${newWeeksLeft}). To move the boat, use \`isintown\` instead.`,
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
     updates.weeksLeft = newWeeksLeft;
   }
 

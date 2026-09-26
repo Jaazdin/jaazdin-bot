@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Boat, Shipment } from '~/db/models/Boat';
-import { createBoatStatusDescription, tableToGenerateChoices, generateShipmentItems } from '~/helpers';
+import { createBoatStatusDescription, tableToGenerateChoices, generateShipmentItems, updateBoatEmbed } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
@@ -143,6 +143,9 @@ async function execute(interaction: ChatInputCommandInteraction) {
       embeds: [embed],
       flags: MessageFlags.Ephemeral,
     });
+
+    // Add the new boat to the weekly post
+    await updateBoatEmbed(boat.boatName);
   } catch (error) {
     await interaction.reply({
       content: `Failed to add boat: ${error}`,

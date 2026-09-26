@@ -1,6 +1,6 @@
 import { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
 import { Shipment } from '~/db/models/Boat';
-import { findBoatByName, boatNameAutocomplete, confirmAction, formatNames } from '~/helpers';
+import { findBoatByName, boatNameAutocomplete, confirmAction, formatNames, refreshBoatMessage } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
@@ -33,7 +33,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
     where: { boatId: boat.id },
   });
 
-  const confirmed = confirmAction({
+  const confirmed = await confirmAction({
     interaction,
     title: 'Destroy Boat',
     description: `Are you sure you want to destroy the boat **${boat.boatName}** and all of its shipments?`,
@@ -65,7 +65,11 @@ async function execute(interaction: ChatInputCommandInteraction) {
   }
   // Destroy all shipments for this boat
   await Promise.all(shipments.map((shipment) => shipment.destroy()));
-  boat.destroy();
+  const messageId = boat.messageId;
+  await boat.destroy();
+
+  // Remove the boat from the weekly post (deletes its message, or redraws the at-sea summary)
+  if (messageId) await refreshBoatMessage(messageId);
 }
 
 async function autocomplete(interaction: AutocompleteInteraction) {

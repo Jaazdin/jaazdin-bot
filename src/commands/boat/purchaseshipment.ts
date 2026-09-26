@@ -56,26 +56,26 @@ async function execute(interaction: ChatInputCommandInteraction) {
   if (shipment.quantity <= 1) {
     await shipment.destroy();
 
-    // Update the boat's Discord embed if it exists
-    await updateBoatEmbed(boatName);
-
     await interaction.reply({
       content: `💰 **Purchase Complete!**\n\nYou purchased the last **${formatNames(itemName)}** from **${formatNames(boatName)}** for **${price} gp**.\n\n⚠️ This item is now sold out!`,
       //flags: MessageFlags.Ephemeral,
     });
+
+    // Update the boat's weekly post after replying, since editing Discord messages can be slow
+    await updateBoatEmbed(boatName);
     return;
   }
 
   shipment.quantity -= 1;
   await shipment.save();
 
-  // Update the boat's Discord embed if it exists
-  await updateBoatEmbed(boatName);
-
   await interaction.reply({
     content: `💰 **Purchase Complete!**\n\nYou purchased **${formatNames(itemName)}** from **${formatNames(boatName)}** for **${price} gp**.\n\n📦 Remaining quantity: **${shipment.quantity}**`,
     //flags: MessageFlags.Ephemeral,
   });
+
+  // Update the boat's weekly post after replying, since editing Discord messages can be slow
+  await updateBoatEmbed(boatName);
 }
 
 // Autocomplete for boat name and item name
