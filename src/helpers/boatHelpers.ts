@@ -70,7 +70,10 @@ export async function boatNameAutocomplete(
   await interaction.respond(filtered);
 }
 
-export async function itemNameAutocomplete(interaction: AutocompleteInteraction): Promise<void> {
+export async function itemNameAutocomplete(
+  interaction: AutocompleteInteraction,
+  options: { inStockOnly?: boolean } = {}
+): Promise<void> {
   const boatName = interaction.options.getString('boat');
   if (!boatName) {
     await interaction.respond([]);
@@ -84,9 +87,9 @@ export async function itemNameAutocomplete(interaction: AutocompleteInteraction)
     return;
   }
 
-  // Find shipments by boatId
+  // Find shipments by boatId, optionally leaving out sold-out items
   const shipments = await Shipment.findAll({
-    where: { boatId: boat.id },
+    where: { boatId: boat.id, ...(options.inStockOnly && { quantity: { [Op.gt]: 0 } }) },
     attributes: ['itemName'],
   });
 
@@ -477,10 +480,11 @@ export async function boatInTownEmbedBuilder(boat: Boat) {
   let fields: { name: string; value: string }[] = [];
   if (boat.tableToGenerate && boat.tableToGenerate !== 'NA') {
     desc += `### ${boatTableDescriptions[boat.tableToGenerate]}:\n\n`;
-    const shipments = await Shipment.findAll({ where: { boatId: boat.id } });
+    // Fixed order so items don't move around in the post as their stock changes
+    const shipments = await Shipment.findAll({ where: { boatId: boat.id }, order: [['id', 'ASC']] });
     fields = shipments.map((s) => ({
       name: `${s.itemName} (${s.type})`,
-      value: `💵 Price: ${s.price} gp\n📦 Remaining Stock: ${s.quantity}`,
+      value: `💵 Price: ${s.price} gp\n${s.quantity > 0 ? `📦 Remaining Stock: ${s.quantity}` : '❌ Sold Out'}`,
       inline: true,
     }));
     if (fields.length === 0) {
@@ -622,7 +626,9 @@ export async function formatShipmentInfo(boatId: number): Promise<string> {
     return 'No active shipments';
   }
 
-  const shipmentList = shipments.map((s) => `• ${formatNames(s.itemName)} (x${s.quantity}) — ${s.price} gp`).join('\n');
+  const shipmentList = shipments
+    .map((s) => `• ${formatNames(s.itemName)} (${s.quantity > 0 ? `x${s.quantity}` : 'sold out'}) — ${s.price} gp`)
+    .join('\n');
 
   return `**Active Shipments:**\n${shipmentList}`;
 }

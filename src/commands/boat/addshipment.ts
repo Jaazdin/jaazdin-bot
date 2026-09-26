@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, AutocompleteInteraction, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Shipment } from '~/db/models/Boat';
-import { boatNameAutocomplete, formatNames, updateBoatEmbed } from '~/helpers';
+import { boatNameAutocomplete, findBoatByName, formatNames, updateBoatEmbed } from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
@@ -41,9 +41,24 @@ async function execute(interaction: ChatInputCommandInteraction) {
   const price = interaction.options.getInteger('price', true);
   const quantity = interaction.options.getInteger('quantity', true);
 
+  const boat = await findBoatByName(interaction, boatName);
+  if (!boat) {
+    return;
+  }
+
+  // Purchases look items up by name, so a second row with the same name would never be reachable
+  const existing = await Shipment.findOne({ where: { boatId: boat.id, itemName } });
+  if (existing) {
+    await interaction.reply({
+      content: `**${formatNames(itemName)}** is already on **${formatNames(boatName)}** (quantity ${existing.quantity}). Use \`/updateshipment\` to change it.`,
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
   try {
     await Shipment.create({
-      boatName,
+      boatId: boat.id,
       itemName,
       price,
       quantity,

@@ -1,6 +1,12 @@
 import { ChatInputCommandInteraction, AutocompleteInteraction, MessageFlags } from 'discord.js';
-import { Boat, Shipment } from '~/db/models/Boat';
-import { parseChangeString, updateBoatEmbed } from '~/helpers';
+import { Shipment } from '~/db/models/Boat';
+import {
+  boatNameAutocomplete,
+  findBoatByName,
+  itemNameAutocomplete,
+  parseChangeString,
+  updateBoatEmbed,
+} from '~/helpers';
 import { CommandData, Roles } from '~/types';
 
 const commandData: CommandData = {
@@ -23,18 +29,12 @@ const commandData: CommandData = {
       required: true,
       autocomplete: true,
     },
-    {
-      name: 'type',
-      type: 'string',
-      description: 'Item type',
-      required: true,
-      autocomplete: true,
-    },
+    { name: 'type', type: 'string', description: 'New item type' },
     { name: 'price', type: 'integer', description: 'New item price (gp)' },
     {
       name: 'quantity',
       type: 'string',
-      description: 'New quantity (+x, -x, =x',
+      description: 'New quantity (+x, -x, =x). Setting it to 0 removes the item',
     },
   ],
 };
@@ -46,7 +46,20 @@ async function execute(interaction: ChatInputCommandInteraction) {
   const price = interaction.options.getInteger('price');
   const quantityRaw = interaction.options.getString('quantity');
 
-  const shipment = await Shipment.findOne({ where: { boatName, itemName } });
+  if (itemType === null && price === null && quantityRaw === null) {
+    await interaction.reply({
+      content: 'No updates provided. Please specify at least one field to update.',
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const boat = await findBoatByName(interaction, boatName);
+  if (!boat) {
+    return;
+  }
+
+  const shipment = await Shipment.findOne({ where: { boatId: boat.id, itemName } });
   if (!shipment) {
     await interaction.reply({
       content: `No shipment found for boat **${boatName}** with item **${itemName}**.`,
@@ -55,34 +68,28 @@ async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
 
-  const quantity = await parseChangeString(quantityRaw, shipment.quantity, 'quantity', 0, null, interaction);
-  if (quantity === null) return;
+  if (quantityRaw !== null) {
+    const quantity = await parseChangeString(quantityRaw, shipment.quantity, 'quantity', 0, null, interaction);
+    if (quantity === null) return;
 
-  // If quantity is zero or less, delete the shipment
-  if (quantity !== null && quantity <= 0) {
-    await shipment.destroy();
+    // If quantity is zero, delete the shipment
+    if (quantity === 0) {
+      await shipment.destroy();
 
-    await interaction.reply({
-      content: `Shipment for **${itemName}** on boat **${boatName}** has been deleted (quantity set to ${quantity}).`,
-      flags: MessageFlags.Ephemeral,
-    });
+      await interaction.reply({
+        content: `Shipment for **${itemName}** on boat **${boatName}** has been deleted (quantity set to 0).`,
+        flags: MessageFlags.Ephemeral,
+      });
 
-    // Update the boat's weekly post after replying, since editing Discord messages can be slow
-    await updateBoatEmbed(boatName);
-    return;
+      // Update the boat's weekly post after replying, since editing Discord messages can be slow
+      await updateBoatEmbed(boatName);
+      return;
+    }
+    shipment.quantity = quantity;
   }
 
   if (price !== null) shipment.price = price;
-  if (quantity !== null) shipment.quantity = quantity;
   if (itemType !== null) shipment.type = itemType;
-
-  if (price === null && quantity === null && itemType === null) {
-    await interaction.reply({
-      content: 'No updates provided. Please specify at least one field to update.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
 
   try {
     await shipment.save();
@@ -107,35 +114,10 @@ async function autocomplete(interaction: AutocompleteInteraction) {
   const focusedOption = interaction.options.getFocused(true);
 
   if (focusedOption.name === 'boat') {
-    const focused = focusedOption.value.toLowerCase();
-    const boats = await Boat.findAll({
-      attributes: ['boatName'],
-      where: { isRunning: true },
-    });
-    const filtered = boats
-      .map((b) => b.boatName)
-      .filter((name) => name.toLowerCase().startsWith(focused))
-      .slice(0, 25)
-      .map((name) => ({ name, value: name }));
-    await interaction.respond(filtered);
+    await boatNameAutocomplete(interaction, { runningOnly: true });
   } else if (focusedOption.name === 'item') {
-    // Autocomplete for item names based on selected boat
-    const boatName = interaction.options.getString('boat');
-    if (!boatName) {
-      await interaction.respond([]);
-      return;
-    }
-    const focused = focusedOption.value.toLowerCase();
-    const shipments = await Shipment.findAll({
-      where: { boatName },
-      attributes: ['itemName'],
-    });
-    const filtered = shipments
-      .map((s) => s.itemName)
-      .filter((name) => name.toLowerCase().startsWith(focused))
-      .slice(0, 25)
-      .map((name) => ({ name, value: name }));
-    await interaction.respond(filtered);
+    // Includes sold-out items so they can be restocked
+    await itemNameAutocomplete(interaction);
   }
 }
 

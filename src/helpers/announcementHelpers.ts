@@ -1,6 +1,5 @@
 import { EmbedBuilder, Colors, TextChannel, MessageFlags, ChatInputCommandInteraction } from 'discord.js';
 import { Announcement } from '~/db/models/Announcement';
-import { client } from '~/index';
 
 /**
  * Create an embed for an announcement
@@ -44,6 +43,8 @@ export async function postAnnouncements(announcements: Announcement[], interacti
   }
 
   try {
+    // Imported here rather than at the top: a top-level import starts the bot in any script that loads the helpers
+    const { client } = await import('~/index');
     const channel = await client.channels.fetch(CHANNEL_ID);
     if (channel instanceof TextChannel) {
       // Discord allows up to 10 embeds per message

@@ -1,11 +1,17 @@
-import { ChatInputCommandInteraction, AutocompleteInteraction, MessageFlags } from 'discord.js';
+import { ChatInputCommandInteraction, AutocompleteInteraction, EmbedBuilder, MessageFlags } from 'discord.js';
 import { Boat, Shipment } from '~/db/models/Boat';
-import { boatNameAutocomplete, formatNames, itemNameAutocomplete, updateBoatEmbed } from '~/helpers';
+import {
+  boatNameAutocomplete,
+  formatNames,
+  itemNameAutocomplete,
+  replyWithUserMention,
+  updateBoatEmbed,
+} from '~/helpers';
 import { CommandData } from '~/types';
 
 const commandData: CommandData = {
   name: 'purchaseshipment',
-  description: 'Purchase a shipment item from a boat (subtracts 1 from quantity, deletes if zero)',
+  description: 'Purchase a shipment item from a boat (subtracts 1 from quantity)',
   category: 'boats',
   options: [
     {
@@ -51,28 +57,29 @@ async function execute(interaction: ChatInputCommandInteraction) {
     });
     return null;
   }
-  const price = shipment.price;
-
-  if (shipment.quantity <= 1) {
-    await shipment.destroy();
-
+  if (shipment.quantity <= 0) {
     await interaction.reply({
-      content: `💰 **Purchase Complete!**\n\nYou purchased the last **${formatNames(itemName)}** from **${formatNames(boatName)}** for **${price} gp**.\n\n⚠️ This item is now sold out!`,
-      //flags: MessageFlags.Ephemeral,
+      content: `❌ **Sold Out**\n\n**${formatNames(itemName)}** on **${formatNames(boatName)}** is sold out.`,
+      flags: MessageFlags.Ephemeral,
     });
-
-    // Update the boat's weekly post after replying, since editing Discord messages can be slow
-    await updateBoatEmbed(boatName);
-    return;
+    return null;
   }
 
+  // Sold-out items are kept at 0 so they still show as sold out in the boat's post
   shipment.quantity -= 1;
   await shipment.save();
+  const soldOut = shipment.quantity === 0;
 
-  await interaction.reply({
-    content: `💰 **Purchase Complete!**\n\nYou purchased **${formatNames(itemName)}** from **${formatNames(boatName)}** for **${price} gp**.\n\n📦 Remaining quantity: **${shipment.quantity}**`,
-    //flags: MessageFlags.Ephemeral,
-  });
+  const embed = new EmbedBuilder()
+    .setTitle('💰 Purchase Complete!')
+    .setDescription(`Purchased **${formatNames(itemName)}** from **${formatNames(boatName)}**.`)
+    .setColor(0x4caf50)
+    .addFields(
+      { name: 'Price', value: `${shipment.price} gp`, inline: true },
+      { name: 'Remaining', value: soldOut ? '⚠️ Sold out!' : `📦 ${shipment.quantity}`, inline: true }
+    );
+
+  await replyWithUserMention(interaction, [embed]);
 
   // Update the boat's weekly post after replying, since editing Discord messages can be slow
   await updateBoatEmbed(boatName);
@@ -87,7 +94,7 @@ async function autocomplete(interaction: AutocompleteInteraction) {
       inTown: true,
     }); // Only running boats
   } else if (focusedOption.name === 'item') {
-    await itemNameAutocomplete(interaction);
+    await itemNameAutocomplete(interaction, { inStockOnly: true }); // Sold-out items can't be purchased
   }
 }
 

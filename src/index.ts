@@ -51,7 +51,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
         content: 'There was an error while executing this command!',
         flags: MessageFlags.Ephemeral,
       };
-      await interaction.respond([{ name: errorMessage.content, value: 'error' }]);
+      // The interaction may already be answered or expired; don't let that crash the bot
+      await interaction
+        .respond([{ name: errorMessage.content, value: 'error' }])
+        .catch((replyError) => console.error('Failed to send autocomplete error:', replyError));
     }
     return;
   }
@@ -77,10 +80,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
       flags: MessageFlags.Ephemeral as const,
     };
 
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp(errorMessage);
-    } else {
-      await interaction.reply(errorMessage);
+    // The interaction may already be answered or expired; don't let that crash the bot
+    try {
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp(errorMessage);
+      } else {
+        await interaction.reply(errorMessage);
+      }
+    } catch (replyError) {
+      console.error('Failed to send error reply:', replyError);
     }
   }
 });
