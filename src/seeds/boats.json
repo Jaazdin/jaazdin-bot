@@ -5,7 +5,7 @@
     "country": "Blancis",
     "waitTime": 5,
     "timeInTown": 2,
-    "jobsAffected": ["Franchiser", "Journalism", "Instructor"],
+    "jobsAffected": ["Franchiser", "Journalism", "Instructor", "Jeweler"],
     "tier2Ability": "If a creature succeeds in training an animal, they gain one additional training point and the DC to tame or train a creature is reduced by 3. ",
     "tableToGenerate": "pets",
     "isRunning": true,

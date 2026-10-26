@@ -7,14 +7,14 @@
     }
   },
   {
-    "bonus": "Secure a shipment of Common goods, roll 1d4.",
+    "bonus": "Gain a shipment type of your choice from the current boat list. Roll 1d8 for Rarity.",
     "roll": {
       "min": 21,
       "max": 40
     }
   },
   {
-    "bonus": "Gain a 10% discount on your next trade fleet purchase. (Max 90%)",
+    "bonus": "Gain a 5% discount on your next trade fleet purchase. (Max 50%)",
     "roll": {
       "min": 41,
       "max": 55
@@ -28,21 +28,21 @@
     }
   },
   {
-    "bonus": "Secure a shipment of Uncommon goods, roll 1d4.",
+    "bonus": "Gain a shipment type of your choice with a 10% discount from the current boat list. Roll 1d12 for Rarity.",
     "roll": {
       "min": 71,
       "max": 85
     }
   },
   {
-    "bonus": "Secure a shipment of Rare goods, roll 1d4.",
+    "bonus": "Gain a shipment type of your choice with a 20% discount from the current boat list. Roll 1d12 for Rarity.",
     "roll": {
       "min": 86,
       "max": 95
     }
   },
   {
-    "bonus": "Gain a 20% discount on your next trade fleet purchase. (Max 90%)",
+    "bonus": "Gain a 10% discount on your next trade fleet purchase. (Max 50%)",
     "roll": {
       "min": 96,
       "max": 105
@@ -56,7 +56,7 @@
     }
   },
   {
-    "bonus": "Secure a shipment of Very Rare goods, roll 1d4.",
+    "bonus": "Gain a shipment type of your choice with a 30% discount from the current boat list. Roll 1d12 for Rarity.",
     "roll": {
       "min": 116,
       "max": 125
@@ -70,7 +70,7 @@
     }
   },
   {
-    "bonus": "Secure a shipment of Legendary goods, roll 1d4.",
+    "bonus": "Gain a shipment type of your choice with a 40% discount from the current boat list. Roll 1d12 for Rarity.",
     "roll": {
       "min": 136,
       "max": 300
